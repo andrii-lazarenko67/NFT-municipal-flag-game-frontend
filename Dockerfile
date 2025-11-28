@@ -14,5 +14,9 @@ COPY . .
 # Build the app (uses .env.production for VITE_ vars)
 RUN npm run build
 
-# Start server - Railway provides PORT env var at runtime
-CMD ["node", "server.js"]
+# Railway requires PORT env var - use shell form to expand env vars
+ENV PORT=8080
+EXPOSE 8080
+
+# Start server
+CMD node server.js
