@@ -24,6 +24,11 @@ if (fs.existsSync(distPath)) {
 }
 console.log(`Index.html exists: ${fs.existsSync(indexPath)}`);
 
+// Health check endpoint
+app.get('/health', (req, res) => {
+  res.json({ status: 'ok', distExists: fs.existsSync(distPath) });
+});
+
 // Serve static files from dist directory
 app.use(express.static(distPath));
 

@@ -11,17 +11,8 @@ RUN npm install
 # Copy source code
 COPY . .
 
-# Copy production env for build
-COPY .env.production .env.production
-
-# Build the app
+# Build the app (uses .env.production for VITE_ vars)
 RUN npm run build
 
-# Railway sets PORT env var - default to 3000
-ENV PORT=3000
-
-# Expose the port Railway will use
-EXPOSE $PORT
-
-# Start server
+# Start server - Railway provides PORT env var at runtime
 CMD ["node", "server.js"]
