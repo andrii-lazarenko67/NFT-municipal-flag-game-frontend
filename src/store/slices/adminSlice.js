@@ -68,11 +68,38 @@ export const toggleCountryVisibility = createAsyncThunk(
   }
 );
 
+export const syncIpfsFromPinata = createAsyncThunk(
+  'admin/syncIpfs',
+  async (_, { getState, rejectWithValue }) => {
+    try {
+      const { adminKey } = getState().admin;
+      const result = await api.syncIpfsFromPinata(adminKey);
+      return result.message || 'IPFS sync completed successfully!';
+    } catch (error) {
+      return rejectWithValue(error.message);
+    }
+  }
+);
+
+export const fetchIpfsStatus = createAsyncThunk(
+  'admin/fetchIpfsStatus',
+  async (_, { getState, rejectWithValue }) => {
+    try {
+      const { adminKey } = getState().admin;
+      const data = await api.getIpfsStatus(adminKey);
+      return data;
+    } catch (error) {
+      return rejectWithValue(error.message);
+    }
+  }
+);
+
 const initialState = {
   authenticated: false,
   adminKey: null,
   stats: null,
   countries: [],
+  ipfsStatus: null,
   loading: false,
   message: null,
   error: null,
@@ -134,6 +161,23 @@ const adminSlice = createSlice({
       // Toggle visibility
       .addCase(toggleCountryVisibility.rejected, (state, action) => {
         state.error = action.payload;
+      })
+      // Sync IPFS from Pinata
+      .addCase(syncIpfsFromPinata.pending, (state) => {
+        state.loading = true;
+        state.message = null;
+      })
+      .addCase(syncIpfsFromPinata.fulfilled, (state, action) => {
+        state.loading = false;
+        state.message = action.payload;
+      })
+      .addCase(syncIpfsFromPinata.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      // Fetch IPFS status
+      .addCase(fetchIpfsStatus.fulfilled, (state, action) => {
+        state.ipfsStatus = action.payload;
       });
   },
 });
@@ -145,6 +189,7 @@ export default adminSlice.reducer;
 export const selectAdminAuthenticated = (state) => state.admin.authenticated;
 export const selectAdminStats = (state) => state.admin.stats;
 export const selectAdminCountries = (state) => state.admin.countries;
+export const selectAdminIpfsStatus = (state) => state.admin.ipfsStatus;
 export const selectAdminLoading = (state) => state.admin.loading;
 export const selectAdminMessage = (state) => state.admin.message;
 export const selectAdminError = (state) => state.admin.error;

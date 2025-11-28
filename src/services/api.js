@@ -214,6 +214,12 @@ export const seedDemoData = (adminKey) =>
 export const resetDatabase = (adminKey) =>
   api.post('/admin/reset', null, { headers: { 'X-Admin-Key': adminKey } });
 
+export const syncIpfsFromPinata = (adminKey) =>
+  api.post('/admin/sync-ipfs-from-pinata', null, { headers: { 'X-Admin-Key': adminKey } });
+
+export const getIpfsStatus = (adminKey) =>
+  api.get('/admin/ipfs-status', { headers: { 'X-Admin-Key': adminKey } });
+
 export const healthCheck = () =>
   api.get('/admin/health');
 

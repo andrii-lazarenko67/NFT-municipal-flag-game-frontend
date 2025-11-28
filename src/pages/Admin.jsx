@@ -8,9 +8,12 @@ import {
   fetchAdminCountries,
   seedDemoData,
   toggleCountryVisibility,
+  syncIpfsFromPinata,
+  fetchIpfsStatus,
   selectAdminAuthenticated,
   selectAdminStats,
   selectAdminCountries,
+  selectAdminIpfsStatus,
   selectAdminLoading,
   selectAdminMessage,
   selectAdminError,
@@ -24,6 +27,7 @@ const Admin = () => {
   const authenticated = useSelector(selectAdminAuthenticated);
   const stats = useSelector(selectAdminStats);
   const countries = useSelector(selectAdminCountries);
+  const ipfsStatus = useSelector(selectAdminIpfsStatus);
   const loading = useSelector(selectAdminLoading);
   const message = useSelector(selectAdminMessage);
   const error = useSelector(selectAdminError);
@@ -31,6 +35,7 @@ const Admin = () => {
   useEffect(() => {
     if (authenticated) {
       dispatch(fetchAdminCountries());
+      dispatch(fetchIpfsStatus());
     }
   }, [dispatch, authenticated]);
 
@@ -44,6 +49,11 @@ const Admin = () => {
   const handleAuth = () => dispatch(authenticate(adminKey));
   const handleSeed = () => dispatch(seedDemoData());
   const handleToggle = (countryId, isVisible) => dispatch(toggleCountryVisibility({ countryId, isVisible }));
+  const handleSyncIpfs = () => {
+    dispatch(syncIpfsFromPinata()).then(() => {
+      dispatch(fetchIpfsStatus());
+    });
+  };
 
   if (!authenticated) {
     return (
@@ -120,6 +130,43 @@ const Admin = () => {
             className="btn btn-primary"
           >
             {loading ? 'Seeding...' : 'Seed Demo Data'}
+          </button>
+        </div>
+      </section>
+
+      {/* IPFS Image Sync */}
+      <section className="mb-8">
+        <h2 className="text-xl font-bold text-white mb-4">IPFS Image Sync</h2>
+        <div className="card p-6">
+          <p className="text-gray-400 mb-4">
+            Sync flag images from Pinata IPFS. This updates the database with the latest image hashes from Pinata.
+          </p>
+          {ipfsStatus && (
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
+              <div className="bg-dark-darker p-3 rounded">
+                <span className="text-primary font-bold block">{ipfsStatus.total_flags}</span>
+                <span className="text-gray-500 text-sm">Total Flags</span>
+              </div>
+              <div className="bg-dark-darker p-3 rounded">
+                <span className="text-green-400 font-bold block">{ipfsStatus.flags_with_image_hash}</span>
+                <span className="text-gray-500 text-sm">With Images</span>
+              </div>
+              <div className="bg-dark-darker p-3 rounded">
+                <span className="text-blue-400 font-bold block">{ipfsStatus.flags_with_metadata_hash}</span>
+                <span className="text-gray-500 text-sm">With Metadata</span>
+              </div>
+              <div className="bg-dark-darker p-3 rounded">
+                <span className="text-yellow-400 font-bold block">{ipfsStatus.flags_pending_upload}</span>
+                <span className="text-gray-500 text-sm">Pending</span>
+              </div>
+            </div>
+          )}
+          <button
+            onClick={handleSyncIpfs}
+            disabled={loading}
+            className="btn btn-secondary"
+          >
+            {loading ? 'Syncing...' : 'Sync Images from Pinata'}
           </button>
         </div>
       </section>
