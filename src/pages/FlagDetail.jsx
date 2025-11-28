@@ -1,5 +1,17 @@
 /**
  * Flag Detail Page - Full flag information with actions
+ *
+ * MULTI-NFT FEATURE DOCUMENTATION:
+ * ================================
+ * This page displays the NFT requirements for obtaining a flag:
+ * - nfts_required=1: Standard single NFT acquisition
+ * - nfts_required=3: Grouped NFTs requiring 3 NFTs to obtain
+ *
+ * UI Changes:
+ * - Shows "Requires X NFTs" badge for grouped flags
+ * - Displays total price (base price * nfts_required)
+ * - Shows per-NFT price breakdown
+ * - Updated action buttons to reflect grouped acquisition
  */
 import { useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
@@ -30,6 +42,9 @@ const FlagDetail = () => {
   const isConnected = useSelector(selectIsConnected);
   const discountedPrice = useSelector(selectDiscountedPrice(id));
 
+  // MULTI-NFT: Get number of NFTs required (default to 1 for backward compatibility)
+  const nftsRequired = flag?.nfts_required || 1;
+
   useEffect(() => {
     dispatch(fetchFlag(id));
   }, [dispatch, id]);
@@ -56,7 +71,12 @@ const FlagDetail = () => {
     try {
       const result = await web3ClaimFirst(flag.id);
       dispatch(claimFirstNFT({ flagId: flag.id, address, transactionHash: result.transactionHash }));
-      alert('First NFT claimed successfully!');
+      // MULTI-NFT: Update success message based on NFTs required
+      if (nftsRequired > 1) {
+        alert(`Successfully claimed ${nftsRequired} first NFTs!`);
+      } else {
+        alert('First NFT claimed successfully!');
+      }
     } catch (err) {
       alert(err.message);
     }
@@ -68,10 +88,17 @@ const FlagDetail = () => {
       return;
     }
     try {
-      const price = discountedPrice || flag.price;
-      const result = await web3PurchaseSecond(flag.id, price);
+      // MULTI-NFT: Calculate total price for all required NFTs
+      const pricePerNft = discountedPrice || flag.price;
+      const totalPrice = parseFloat(pricePerNft) * nftsRequired;
+      const result = await web3PurchaseSecond(flag.id, totalPrice.toString());
       dispatch(purchaseSecondNFT({ flagId: flag.id, address, transactionHash: result.transactionHash }));
-      alert('Second NFT purchased! Pair complete!');
+      // MULTI-NFT: Update success message based on NFTs required
+      if (nftsRequired > 1) {
+        alert(`Successfully purchased ${nftsRequired} second NFTs! Pair complete!`);
+      } else {
+        alert('Second NFT purchased! Pair complete!');
+      }
     } catch (err) {
       alert(err.message);
     }
@@ -85,6 +112,12 @@ const FlagDetail = () => {
     : `https://placehold.co/500x500/1a1a2e/e94560?text=${encodeURIComponent(flag.location_type)}`;
 
   const hasUserInterest = flag.interests?.some(i => i.user?.wallet_address === address?.toLowerCase());
+
+  // MULTI-NFT: Calculate total prices
+  const basePricePerNft = parseFloat(flag.price);
+  const totalBasePrice = basePricePerNft * nftsRequired;
+  const discountedPricePerNft = discountedPrice ? parseFloat(discountedPrice) : basePricePerNft;
+  const totalDiscountedPrice = discountedPricePerNft * nftsRequired;
 
   return (
     <div className="page-container">
@@ -106,8 +139,14 @@ const FlagDetail = () => {
           <div className="card overflow-hidden">
             <img src={imageUrl} alt={flag.name} className="w-full aspect-square object-cover" />
           </div>
-          <div className="flex gap-2 mt-4">
+          <div className="flex gap-2 mt-4 flex-wrap">
             <span className={`badge badge-${flag.category.toLowerCase()}`}>{flag.category}</span>
+            {/* MULTI-NFT: Badge showing NFTs required */}
+            {nftsRequired > 1 && (
+              <span className="badge bg-purple-600/80 text-purple-100">
+                Requires {nftsRequired} NFTs
+              </span>
+            )}
             <span className={`badge ${flag.is_pair_complete ? 'badge-complete' : flag.first_nft_status === 'claimed' ? 'badge-claimed' : 'badge-available'}`}>
               {flag.is_pair_complete ? 'Complete' : flag.first_nft_status === 'claimed' ? 'First Claimed' : 'Available'}
             </span>
@@ -119,21 +158,50 @@ const FlagDetail = () => {
           <h1 className="text-3xl font-bold text-white mb-2">{flag.location_type} Flag</h1>
           <p className="text-gray-400 font-mono mb-6">{flag.name}</p>
 
-          {/* Price */}
+          {/* MULTI-NFT: NFT Requirements Info Box */}
+          {nftsRequired > 1 && (
+            <div className="card p-4 mb-4 bg-purple-900/20 border border-purple-600/30">
+              <h3 className="text-purple-300 font-semibold mb-2">Grouped NFT Flag</h3>
+              <p className="text-gray-400 text-sm">
+                This flag requires <span className="text-purple-300 font-bold">{nftsRequired} NFTs</span> to obtain.
+                You will mint/purchase {nftsRequired} NFT pairs in a single transaction.
+              </p>
+            </div>
+          )}
+
+          {/* Price - Updated for Multi-NFT */}
           <div className="card p-6 mb-6">
+            {/* MULTI-NFT: Show per-NFT and total price */}
             <div className="flex justify-between items-center mb-2">
-              <span className="text-gray-400">Base Price:</span>
+              <span className="text-gray-400">Price per NFT:</span>
               <span className="text-white font-semibold">{config.formatPrice(flag.price)} MATIC</span>
             </div>
-            {discountedPrice && discountedPrice !== flag.price && (
-              <div className="flex justify-between items-center">
-                <span className="text-gray-400">Your Price:</span>
-                <span className="text-primary font-semibold">{config.formatPrice(discountedPrice)} MATIC</span>
+
+            {nftsRequired > 1 && (
+              <div className="flex justify-between items-center mb-2 pt-2 border-t border-gray-700">
+                <span className="text-gray-400">Total Price ({nftsRequired} NFTs):</span>
+                <span className="text-primary font-bold text-lg">{config.formatPrice(totalBasePrice)} MATIC</span>
               </div>
+            )}
+
+            {/* Show discounted price if applicable */}
+            {discountedPrice && parseFloat(discountedPrice) !== basePricePerNft && (
+              <>
+                <div className="flex justify-between items-center mt-3 pt-3 border-t border-gray-700">
+                  <span className="text-gray-400">Your Price per NFT:</span>
+                  <span className="text-green-400 font-semibold">{config.formatPrice(discountedPrice)} MATIC</span>
+                </div>
+                {nftsRequired > 1 && (
+                  <div className="flex justify-between items-center">
+                    <span className="text-gray-400">Your Total Price:</span>
+                    <span className="text-green-400 font-bold text-lg">{config.formatPrice(totalDiscountedPrice)} MATIC</span>
+                  </div>
+                )}
+              </>
             )}
           </div>
 
-          {/* Actions */}
+          {/* Actions - Updated for Multi-NFT */}
           <div className="space-y-3 mb-8">
             {!flag.is_pair_complete && (
               <>
@@ -153,7 +221,11 @@ const FlagDetail = () => {
                       disabled={actionLoading}
                       className="btn btn-primary w-full"
                     >
-                      {actionLoading ? 'Processing...' : 'Claim First NFT (Free)'}
+                      {actionLoading ? 'Processing...' : (
+                        nftsRequired > 1
+                          ? `Claim First ${nftsRequired} NFTs (Free)`
+                          : 'Claim First NFT (Free)'
+                      )}
                     </button>
                   </>
                 )}
@@ -163,7 +235,11 @@ const FlagDetail = () => {
                     disabled={actionLoading}
                     className="btn btn-primary w-full"
                   >
-                    {actionLoading ? 'Processing...' : `Purchase Second NFT (${config.formatPrice(discountedPrice || flag.price)} MATIC)`}
+                    {actionLoading ? 'Processing...' : (
+                      nftsRequired > 1
+                        ? `Purchase ${nftsRequired} Second NFTs (${config.formatPrice(totalDiscountedPrice)} MATIC)`
+                        : `Purchase Second NFT (${config.formatPrice(discountedPrice || flag.price)} MATIC)`
+                    )}
                   </button>
                 )}
               </>

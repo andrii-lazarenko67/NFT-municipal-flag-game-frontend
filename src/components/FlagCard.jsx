@@ -1,10 +1,19 @@
 /**
  * Flag Card Component - Displays a flag with its details
+ *
+ * MULTI-NFT FEATURE:
+ * Displays the number of NFTs required to obtain a flag.
+ * - nfts_required=1: Shows standard price
+ * - nfts_required=3: Shows "3x NFTs" badge and total price (price * 3)
  */
 import { Link } from 'react-router-dom';
 import config from '../config';
 
 const FlagCard = ({ flag, showMunicipality = false }) => {
+  // MULTI-NFT: Calculate total price based on NFTs required
+  const nftsRequired = flag.nfts_required || 1;
+  const totalPrice = parseFloat(flag.price) * nftsRequired;
+
   const getStatusBadge = () => {
     if (flag.is_pair_complete) {
       return <span className="badge badge-complete">Complete</span>;
@@ -18,6 +27,19 @@ const FlagCard = ({ flag, showMunicipality = false }) => {
   const getCategoryBadge = () => {
     const categoryClass = flag.category.toLowerCase();
     return <span className={`badge badge-${categoryClass}`}>{flag.category}</span>;
+  };
+
+  /**
+   * MULTI-NFT: Badge showing how many NFTs are required
+   * Only displayed when nfts_required > 1 (grouped NFT flags)
+   */
+  const getNftRequirementBadge = () => {
+    if (nftsRequired <= 1) return null;
+    return (
+      <span className="badge bg-purple-600/80 text-purple-100">
+        {nftsRequired}x NFTs
+      </span>
+    );
   };
 
   const getImageUrl = () => {
@@ -41,6 +63,7 @@ const FlagCard = ({ flag, showMunicipality = false }) => {
         />
         <div className="absolute top-3 left-3 flex flex-wrap gap-2">
           {getCategoryBadge()}
+          {getNftRequirementBadge()}
           {getStatusBadge()}
         </div>
       </div>
@@ -51,7 +74,17 @@ const FlagCard = ({ flag, showMunicipality = false }) => {
           <p className="text-gray-500 text-xs mb-2">{flag.municipality.name}</p>
         )}
         <div className="flex items-center justify-between pt-2 border-t border-gray-800">
-          <span className="text-primary font-medium">{config.formatPrice(flag.price)} MATIC</span>
+          {/* MULTI-NFT: Show total price and per-NFT breakdown if grouped */}
+          <div className="flex flex-col">
+            <span className="text-primary font-medium">
+              {config.formatPrice(totalPrice)} MATIC
+            </span>
+            {nftsRequired > 1 && (
+              <span className="text-gray-500 text-xs">
+                ({config.formatPrice(flag.price)} x {nftsRequired})
+              </span>
+            )}
+          </div>
           <span className="text-gray-500 text-sm">{flag.interest_count || 0} interested</span>
         </div>
       </div>
