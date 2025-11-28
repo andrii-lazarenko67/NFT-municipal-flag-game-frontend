@@ -7,6 +7,7 @@ __pycache__/
 # Environment
 .env
 .env.local
+# Note: .env.production is NOT gitignored - it contains only public config for Railway deployment
 
 # Build outputs
 build/
