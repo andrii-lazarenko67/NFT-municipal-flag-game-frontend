@@ -31,9 +31,7 @@ const Header = () => {
             <NavLink to="/countries" active={isActive('/countries')}>Explore</NavLink>
             <NavLink to="/auctions" active={isActive('/auctions')}>Auctions</NavLink>
             <NavLink to="/rankings" active={isActive('/rankings')}>Rankings</NavLink>
-            {isConnected && (
-              <NavLink to="/profile" active={isActive('/profile')}>Profile</NavLink>
-            )}
+            <NavLink to="/profile" active={isActive('/profile')}>Profile</NavLink>
             <NavLink to="/admin" active={isActive('/admin')}>Admin</NavLink>
           </nav>
 
@@ -83,9 +81,7 @@ const Header = () => {
         <MobileNavLink to="/countries" active={isActive('/countries')}>Explore</MobileNavLink>
         <MobileNavLink to="/auctions" active={isActive('/auctions')}>Auctions</MobileNavLink>
         <MobileNavLink to="/rankings" active={isActive('/rankings')}>Rankings</MobileNavLink>
-        {isConnected && (
-          <MobileNavLink to="/profile" active={isActive('/profile')}>Profile</MobileNavLink>
-        )}
+        <MobileNavLink to="/profile" active={isActive('/profile')}>Profile</MobileNavLink>
       </nav>
     </header>
   );
