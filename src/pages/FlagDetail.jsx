@@ -82,7 +82,7 @@ const FlagDetail = () => {
 
   const imageUrl = flag.image_ipfs_hash
     ? config.getIpfsUrl(flag.image_ipfs_hash)
-    : `https://via.placeholder.com/500x500/1a1a2e/e94560?text=${encodeURIComponent(flag.location_type)}`;
+    : `https://placehold.co/500x500/1a1a2e/e94560?text=${encodeURIComponent(flag.location_type)}`;
 
   const hasUserInterest = flag.interests?.some(i => i.user?.wallet_address === address?.toLowerCase());
 

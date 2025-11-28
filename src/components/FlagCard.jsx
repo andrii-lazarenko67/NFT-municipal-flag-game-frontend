@@ -24,7 +24,8 @@ const FlagCard = ({ flag, showMunicipality = false }) => {
     if (flag.image_ipfs_hash) {
       return config.getIpfsUrl(flag.image_ipfs_hash);
     }
-    return `https://via.placeholder.com/300x300/1a1a2e/e94560?text=${encodeURIComponent(flag.location_type)}`;
+    // Use placehold.co as fallback (more reliable than via.placeholder.com)
+    return `https://placehold.co/300x300/1a1a2e/e94560?text=${encodeURIComponent(flag.location_type)}`;
   };
 
   return (
@@ -35,7 +36,7 @@ const FlagCard = ({ flag, showMunicipality = false }) => {
           alt={flag.name}
           className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
           onError={(e) => {
-            e.target.src = `https://via.placeholder.com/300x300/1a1a2e/e94560?text=${encodeURIComponent(flag.location_type)}`;
+            e.target.src = `https://placehold.co/300x300/1a1a2e/e94560?text=${encodeURIComponent(flag.location_type)}`;
           }}
         />
         <div className="absolute top-3 left-3 flex flex-wrap gap-2">
