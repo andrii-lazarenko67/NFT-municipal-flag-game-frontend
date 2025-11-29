@@ -25,8 +25,21 @@ const FlagCard = ({ flag, showMunicipality = false }) => {
   };
 
   const getCategoryBadge = () => {
-    const categoryClass = flag.category.toLowerCase();
-    return <span className={`badge badge-${categoryClass}`}>{flag.category}</span>;
+    const category = flag.category.toLowerCase();
+    const styles = {
+      standard: 'text-gray-100 border-gray-500',
+      plus: 'text-blue-400 border-blue-500',
+      premium: 'text-yellow-400 border-yellow-500 font-bold',
+    };
+    const colorClass = styles[category] || styles.standard;
+    return (
+      <span
+        className={`badge border ${colorClass}`}
+        style={{ backgroundColor: 'rgba(0, 0, 0, 0.7)' }}
+      >
+        {flag.category}
+      </span>
+    );
   };
 
   /**
