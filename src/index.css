@@ -46,15 +46,18 @@
   }
 
   .badge-standard {
-    @apply bg-black/70 text-gray-100 border border-gray-500;
+    @apply text-gray-100 border border-gray-500;
+    background-color: rgba(0, 0, 0, 0.7);
   }
 
   .badge-plus {
-    @apply bg-black/70 text-blue-400 border border-blue-500;
+    @apply text-blue-400 border border-blue-500;
+    background-color: rgba(0, 0, 0, 0.7);
   }
 
   .badge-premium {
-    @apply bg-black/70 text-yellow-400 border border-yellow-500 font-bold;
+    @apply text-yellow-400 border border-yellow-500 font-bold;
+    background-color: rgba(0, 0, 0, 0.7);
   }
 
   .badge-available {
