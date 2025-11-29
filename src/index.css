@@ -46,7 +46,7 @@
   }
 
   .badge-standard {
-    @apply bg-black/70 text-gray-200 border border-gray-500;
+    @apply bg-black/70 text-gray-100 border border-gray-500;
   }
 
   .badge-plus {
