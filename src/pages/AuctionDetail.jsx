@@ -22,6 +22,7 @@ import {
 import { selectAddress, selectIsConnected, connectWallet } from '../store/slices/walletSlice';
 import Loading from '../components/Loading';
 import config from '../config';
+import { useAnimation, usePageLoadAnimation, animationPatterns } from '../hooks/useAnimation';
 
 const AuctionDetail = () => {
   const { id } = useParams();
@@ -31,6 +32,11 @@ const AuctionDetail = () => {
   const actionLoading = useSelector(selectActionLoading);
   const address = useSelector(selectAddress);
   const isConnected = useSelector(selectIsConnected);
+
+  // Animation hooks
+  const headerRef = usePageLoadAnimation(100);
+  const { ref: contentRef } = useAnimation({ threshold: 0.1 });
+  const { ref: bidHistoryRef } = useAnimation({ threshold: 0.1 });
 
   const [bidAmount, setBidAmount] = useState('');
   const [bidderCategory, setBidderCategory] = useState('standard');
@@ -110,10 +116,14 @@ const AuctionDetail = () => {
   if (!auction) {
     return (
       <div className="page-container">
-        <div className="text-center py-16">
+        <div
+          data-animate="zoom-in"
+          data-duration="fast"
+          className="text-center py-16"
+        >
           <p className="text-red-400">Auction not found</p>
           <Link to="/auctions" className="text-primary hover:text-primary-light mt-4 inline-block">
-            ← Back to Auctions
+            Back to Auctions
           </Link>
         </div>
       </div>
@@ -158,16 +168,35 @@ const AuctionDetail = () => {
   return (
     <div className="page-container">
       {/* Breadcrumb */}
-      <nav className="breadcrumb mb-6">
-        <Link to="/auctions">Auctions</Link>
-        <span>/</span>
-        <span className="text-white">Auction #{auction.id}</span>
+      <nav ref={headerRef} className="breadcrumb mb-6">
+        <Link
+          to="/auctions"
+          data-animate="fade-right"
+          data-duration="fast"
+          data-delay="0"
+        >
+          Auctions
+        </Link>
+        <span data-animate="fade" data-duration="fast" data-delay="1">/</span>
+        <span
+          data-animate="fade-left"
+          data-duration="fast"
+          data-delay="2"
+          className="text-white"
+        >
+          Auction #{auction.id}
+        </span>
       </nav>
 
-      <div className="grid lg:grid-cols-2 gap-8">
+      <div ref={contentRef} className="grid lg:grid-cols-2 gap-8">
         {/* Image Section */}
         <div>
-          <div className="card overflow-hidden relative">
+          <div
+            data-animate="zoom-in"
+            data-duration="slow"
+            data-delay="0"
+            className="card overflow-hidden relative"
+          >
             {/* Buyout Badge */}
             {auction.buyout_price && auction.status === 'active' && (
               <div className="absolute top-2 right-2 z-10">
@@ -188,12 +217,17 @@ const AuctionDetail = () => {
 
           {/* Flag Info */}
           {auction.flag && (
-            <div className="mt-4">
+            <div
+              data-animate="fade-up"
+              data-duration="normal"
+              data-delay="2"
+              className="mt-4"
+            >
               <Link
                 to={`/flags/${auction.flag_id}`}
                 className="text-primary hover:text-primary-light"
               >
-                View Flag Details →
+                View Flag Details
               </Link>
               <div className="flex gap-2 mt-2">
                 {auction.flag.category && (
@@ -211,12 +245,22 @@ const AuctionDetail = () => {
 
         {/* Auction Info Section */}
         <div>
-          <h1 className="text-3xl font-bold text-white mb-2">
+          <h1
+            data-animate="fade-down"
+            data-duration="normal"
+            data-delay="1"
+            className="text-3xl font-bold text-white mb-2"
+          >
             {auction.flag?.name || `Flag #${auction.flag_id}`}
           </h1>
 
           {/* Status Badge */}
-          <div className="mb-6 flex gap-2">
+          <div
+            data-animate="fade-up"
+            data-duration="normal"
+            data-delay="2"
+            className="mb-6 flex gap-2"
+          >
             <span className={`badge ${isEnded ? 'bg-gray-600' : 'bg-green-600'} text-white`}>
               {auction.status === 'active' ? (isEnded ? 'Time Ended' : 'Active') : auction.status}
             </span>
@@ -228,7 +272,12 @@ const AuctionDetail = () => {
           </div>
 
           {/* Auction Stats */}
-          <div className="card p-6 mb-6">
+          <div
+            data-animate="fade-up"
+            data-duration="normal"
+            data-delay="3"
+            className="card p-6 mb-6"
+          >
             <div className="space-y-4">
               <div className="flex justify-between items-center">
                 <span className="text-gray-400">Starting Price:</span>
@@ -276,7 +325,12 @@ const AuctionDetail = () => {
           </div>
 
           {/* Seller Info */}
-          <div className="card p-6 mb-6">
+          <div
+            data-animate="fade-left"
+            data-duration="normal"
+            data-delay="4"
+            className="card p-6 mb-6"
+          >
             <h3 className="text-white font-semibold mb-2">Seller</h3>
             <p className="text-gray-400 font-mono text-sm">
               {config.truncateAddress(auction.seller?.wallet_address, 8)}
@@ -290,7 +344,12 @@ const AuctionDetail = () => {
 
           {/* Highest Bidder */}
           {auction.highest_bidder && (
-            <div className="card p-6 mb-6 bg-primary/10 border-primary/30">
+            <div
+              data-animate="fade-left"
+              data-duration="normal"
+              data-delay="5"
+              className="card p-6 mb-6 bg-primary/10 border-primary/30"
+            >
               <h3 className="text-white font-semibold mb-2">Highest Bidder</h3>
               <p className="text-primary font-mono text-sm">
                 {config.truncateAddress(auction.highest_bidder.wallet_address, 8)}
@@ -300,7 +359,12 @@ const AuctionDetail = () => {
 
           {/* Buyout Button */}
           {!isEnded && auction.status === 'active' && auction.buyout_price && !isSeller && (
-            <div className="card p-6 mb-6 bg-yellow-500/10 border-yellow-500/30">
+            <div
+              data-animate="bounce-in"
+              data-duration="normal"
+              data-delay="5"
+              className="card p-6 mb-6 bg-yellow-500/10 border-yellow-500/30"
+            >
               <h3 className="text-yellow-400 font-semibold mb-2">Instant Buyout</h3>
               <p className="text-gray-400 text-sm mb-4">
                 Skip the bidding and purchase this flag instantly for {config.formatPrice(auction.buyout_price)} POL
@@ -323,7 +387,12 @@ const AuctionDetail = () => {
 
           {/* Bid Form */}
           {!isEnded && auction.status === 'active' && (
-            <div className="card p-6 mb-6">
+            <div
+              data-animate="fade-up"
+              data-duration="normal"
+              data-delay="6"
+              className="card p-6 mb-6"
+            >
               <h3 className="text-white font-semibold mb-4">Place a Bid</h3>
 
               {!isConnected ? (
@@ -387,7 +456,11 @@ const AuctionDetail = () => {
           )}
 
           {isEnded && auction.status === 'active' && (
-            <div className="card p-4 bg-yellow-600/10 border-yellow-600/30 text-center mb-6">
+            <div
+              data-animate="fade-up"
+              data-duration="normal"
+              className="card p-4 bg-yellow-600/10 border-yellow-600/30 text-center mb-6"
+            >
               <p className="text-yellow-600">
                 This auction has ended and is waiting to be closed
               </p>
@@ -398,11 +471,27 @@ const AuctionDetail = () => {
 
       {/* Bid History */}
       {auction.bids && auction.bids.length > 0 && (
-        <div className="mt-8">
-          <h2 className="text-xl font-bold text-white mb-4">Bid History ({auction.bids.length})</h2>
-          <div className="card divide-y divide-gray-800">
-            {auction.bids.map((bid) => (
-              <div key={bid.id} className="p-4 flex items-center justify-between">
+        <div ref={bidHistoryRef} className="mt-8">
+          <h2
+            data-animate="fade-right"
+            data-duration="normal"
+            data-delay="0"
+            className="text-xl font-bold text-white mb-4"
+          >
+            Bid History ({auction.bids.length})
+          </h2>
+          <div
+            data-animate="fade-up"
+            data-duration="normal"
+            data-delay="1"
+            className="card divide-y divide-gray-800"
+          >
+            {auction.bids.map((bid, index) => (
+              <div
+                key={bid.id}
+                {...animationPatterns.list(index)}
+                className="p-4 flex items-center justify-between"
+              >
                 <div>
                   <div className="flex items-center gap-2">
                     <p className="text-white font-mono text-sm">

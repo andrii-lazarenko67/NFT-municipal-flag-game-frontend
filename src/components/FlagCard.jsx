@@ -8,8 +8,9 @@
  */
 import { Link } from 'react-router-dom';
 import config from '../config';
+import { animationPatterns } from '../hooks/useAnimation';
 
-const FlagCard = ({ flag, showMunicipality = false }) => {
+const FlagCard = ({ flag, showMunicipality = false, index = 0 }) => {
   // MULTI-NFT: Calculate total price based on NFTs required
   const nftsRequired = flag.nfts_required || 1;
   const totalPrice = parseFloat(flag.price) * nftsRequired;
@@ -64,7 +65,11 @@ const FlagCard = ({ flag, showMunicipality = false }) => {
   };
 
   return (
-    <Link to={`/flags/${flag.id}`} className="card card-hover group block">
+    <Link
+      to={`/flags/${flag.id}`}
+      className="card card-hover group block"
+      {...animationPatterns.cards(index)}
+    >
       <div className="relative aspect-square overflow-hidden">
         <img
           src={getImageUrl()}

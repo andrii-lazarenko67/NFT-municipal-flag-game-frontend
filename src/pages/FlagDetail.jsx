@@ -31,6 +31,7 @@ import { selectAddress, selectIsConnected } from '../store/slices/walletSlice';
 import { claimFirstNFT as web3ClaimFirst, purchaseSecondNFT as web3PurchaseSecond } from '../services/web3';
 import config from '../config';
 import Loading from '../components/Loading';
+import { useAnimation, usePageLoadAnimation } from '../hooks/useAnimation';
 
 const FlagDetail = () => {
   const { id } = useParams();
@@ -41,6 +42,10 @@ const FlagDetail = () => {
   const address = useSelector(selectAddress);
   const isConnected = useSelector(selectIsConnected);
   const discountedPrice = useSelector(selectDiscountedPrice(id));
+
+  // Animation hooks
+  const headerRef = usePageLoadAnimation(100);
+  const { ref: contentRef } = useAnimation({ threshold: 0.1 });
 
   // MULTI-NFT: Get number of NFTs required (default to 1 for backward compatibility)
   const nftsRequired = flag?.nfts_required || 1;
@@ -121,25 +126,56 @@ const FlagDetail = () => {
 
   return (
     <div className="page-container">
-      <nav className="breadcrumb">
-        <Link to="/countries">Countries</Link>
+      <nav ref={headerRef} className="breadcrumb">
+        <Link
+          to="/countries"
+          data-animate="fade-right"
+          data-duration="fast"
+          data-delay="0"
+        >
+          Countries
+        </Link>
         {flag.municipality && (
           <>
-            <span>/</span>
-            <Link to={`/municipalities/${flag.municipality.id}`}>{flag.municipality.name}</Link>
+            <span data-animate="fade" data-duration="fast" data-delay="1">/</span>
+            <Link
+              to={`/municipalities/${flag.municipality.id}`}
+              data-animate="fade-right"
+              data-duration="fast"
+              data-delay="1"
+            >
+              {flag.municipality.name}
+            </Link>
           </>
         )}
-        <span>/</span>
-        <span className="text-white">{flag.location_type}</span>
+        <span data-animate="fade" data-duration="fast" data-delay="2">/</span>
+        <span
+          data-animate="fade-left"
+          data-duration="fast"
+          data-delay="3"
+          className="text-white"
+        >
+          {flag.location_type}
+        </span>
       </nav>
 
-      <div className="grid lg:grid-cols-2 gap-8">
+      <div ref={contentRef} className="grid lg:grid-cols-2 gap-8">
         {/* Image Section */}
         <div>
-          <div className="card overflow-hidden">
+          <div
+            data-animate="zoom-in"
+            data-duration="slow"
+            data-delay="0"
+            className="card overflow-hidden"
+          >
             <img src={imageUrl} alt={flag.name} className="w-full aspect-square object-cover" />
           </div>
-          <div className="flex gap-2 mt-4 flex-wrap">
+          <div
+            data-animate="fade-up"
+            data-duration="normal"
+            data-delay="2"
+            className="flex gap-2 mt-4 flex-wrap"
+          >
             <span className={`badge badge-${flag.category.toLowerCase()}`}>{flag.category}</span>
             {/* MULTI-NFT: Badge showing NFTs required */}
             {nftsRequired > 1 && (
@@ -155,12 +191,31 @@ const FlagDetail = () => {
 
         {/* Info Section */}
         <div>
-          <h1 className="text-3xl font-bold text-white mb-2">{flag.location_type} Flag</h1>
-          <p className="text-gray-400 font-mono mb-6">{flag.name}</p>
+          <h1
+            data-animate="fade-down"
+            data-duration="normal"
+            data-delay="1"
+            className="text-3xl font-bold text-white mb-2"
+          >
+            {flag.location_type} Flag
+          </h1>
+          <p
+            data-animate="fade-up"
+            data-duration="normal"
+            data-delay="2"
+            className="text-gray-400 font-mono mb-6"
+          >
+            {flag.name}
+          </p>
 
           {/* MULTI-NFT: NFT Requirements Info Box */}
           {nftsRequired > 1 && (
-            <div className="card p-4 mb-4 bg-purple-900/20 border border-purple-600/30">
+            <div
+              data-animate="fade-right"
+              data-duration="normal"
+              data-delay="3"
+              className="card p-4 mb-4 bg-purple-900/20 border border-purple-600/30"
+            >
               <h3 className="text-purple-300 font-semibold mb-2">Grouped NFT Flag</h3>
               <p className="text-gray-400 text-sm">
                 This flag requires <span className="text-purple-300 font-bold">{nftsRequired} NFTs</span> to obtain.
@@ -170,7 +225,12 @@ const FlagDetail = () => {
           )}
 
           {/* Price - Updated for Multi-NFT */}
-          <div className="card p-6 mb-6">
+          <div
+            data-animate="fade-up"
+            data-duration="normal"
+            data-delay="3"
+            className="card p-6 mb-6"
+          >
             {/* MULTI-NFT: Show per-NFT and total price */}
             <div className="flex justify-between items-center mb-2">
               <span className="text-gray-400">Price per NFT:</span>
@@ -202,7 +262,12 @@ const FlagDetail = () => {
           </div>
 
           {/* Actions - Updated for Multi-NFT */}
-          <div className="space-y-3 mb-8">
+          <div
+            data-animate="fade-up"
+            data-duration="normal"
+            data-delay="4"
+            className="space-y-3 mb-8"
+          >
             {!flag.is_pair_complete && (
               <>
                 {flag.first_nft_status === 'available' && (
@@ -252,12 +317,23 @@ const FlagDetail = () => {
           </div>
 
           {/* Interested Users */}
-          <div className="card p-6 mb-4">
+          <div
+            data-animate="fade-left"
+            data-duration="normal"
+            data-delay="5"
+            className="card p-6 mb-4"
+          >
             <h3 className="text-white font-semibold mb-4">Interested Users ({flag.interests?.length || 0})</h3>
             {flag.interests?.length > 0 ? (
               <ul className="space-y-2">
-                {flag.interests.map((interest) => (
-                  <li key={interest.id} className="text-gray-400 text-sm font-mono">
+                {flag.interests.map((interest, index) => (
+                  <li
+                    key={interest.id}
+                    data-animate="fade-right"
+                    data-duration="fast"
+                    data-delay={String(index % 6)}
+                    className="text-gray-400 text-sm font-mono"
+                  >
                     {config.truncateAddress(interest.user?.wallet_address)}
                   </li>
                 ))}
@@ -268,12 +344,23 @@ const FlagDetail = () => {
           </div>
 
           {/* Owners */}
-          <div className="card p-6">
+          <div
+            data-animate="fade-left"
+            data-duration="normal"
+            data-delay="6"
+            className="card p-6"
+          >
             <h3 className="text-white font-semibold mb-4">Owners</h3>
             {flag.ownerships?.length > 0 ? (
               <ul className="space-y-2">
-                {flag.ownerships.map((ownership) => (
-                  <li key={ownership.id} className="flex justify-between text-sm">
+                {flag.ownerships.map((ownership, index) => (
+                  <li
+                    key={ownership.id}
+                    data-animate="fade-right"
+                    data-duration="fast"
+                    data-delay={String(index % 6)}
+                    className="flex justify-between text-sm"
+                  >
                     <span className="text-gray-400 font-mono">{config.truncateAddress(ownership.user?.wallet_address)}</span>
                     <span className="text-gray-500">{ownership.ownership_type}</span>
                   </li>
@@ -291,7 +378,11 @@ const FlagDetail = () => {
 
 const ErrorDisplay = ({ message }) => (
   <div className="page-container">
-    <div className="text-center py-16">
+    <div
+      data-animate="zoom-in"
+      data-duration="fast"
+      className="text-center py-16"
+    >
       <p className="text-red-400">{message}</p>
     </div>
   </div>

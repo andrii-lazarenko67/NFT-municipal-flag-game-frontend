@@ -6,12 +6,17 @@ import { Link } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import { fetchCountries, selectCountries, selectCountriesLoading, selectCountriesError } from '../store/slices/countriesSlice';
 import Loading from '../components/Loading';
+import { useAnimation, usePageLoadAnimation } from '../hooks/useAnimation';
 
 const Countries = () => {
   const dispatch = useDispatch();
   const countries = useSelector(selectCountries);
   const loading = useSelector(selectCountriesLoading);
   const error = useSelector(selectCountriesError);
+
+  // Animation hooks
+  const headerRef = usePageLoadAnimation(100);
+  const { ref: gridRef } = useAnimation({ threshold: 0.1 });
 
   useEffect(() => {
     dispatch(fetchCountries());
@@ -27,17 +32,34 @@ const Countries = () => {
 
   return (
     <div className="page-container">
-      <div className="page-header">
-        <h1 className="page-title">Explore Countries</h1>
-        <p className="page-subtitle">Select a country to explore its regions and municipal flags</p>
+      <div ref={headerRef} className="page-header">
+        <h1
+          data-animate="fade-down"
+          data-duration="normal"
+          data-delay="0"
+          className="page-title"
+        >
+          Explore Countries
+        </h1>
+        <p
+          data-animate="fade-up"
+          data-duration="normal"
+          data-delay="1"
+          className="page-subtitle"
+        >
+          Select a country to explore its regions and municipal flags
+        </p>
       </div>
 
-      <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-        {countries.map((country) => (
+      <div ref={gridRef} className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+        {countries.map((country, index) => (
           <Link
             to={`/countries/${country.id}`}
             key={country.id}
-            className="card card-hover p-6 flex items-center gap-4"
+            data-animate={index % 2 === 0 ? "fade-up" : "zoom-in"}
+            data-duration="normal"
+            data-delay={String(index % 8)}
+            className="card card-hover card-animate p-6 flex items-center gap-4"
           >
             <span className="text-5xl">{getCountryEmoji(country.code)}</span>
             <div>
@@ -52,7 +74,11 @@ const Countries = () => {
       </div>
 
       {countries.length === 0 && (
-        <div className="text-center py-16">
+        <div
+          data-animate="fade-up"
+          data-duration="slow"
+          className="text-center py-16"
+        >
           <p className="text-gray-400">No countries available. Please seed the demo data.</p>
         </div>
       )}
@@ -62,7 +88,11 @@ const Countries = () => {
 
 const ErrorDisplay = ({ message }) => (
   <div className="page-container">
-    <div className="text-center py-16">
+    <div
+      data-animate="zoom-in"
+      data-duration="fast"
+      className="text-center py-16"
+    >
       <p className="text-red-400">Error: {message}</p>
     </div>
   </div>

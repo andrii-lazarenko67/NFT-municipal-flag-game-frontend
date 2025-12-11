@@ -58,6 +58,7 @@ import {
 } from '../store/slices/adminSlice';
 import { Link } from 'react-router-dom';
 import config from '../config';
+import { usePageLoadAnimation, useAnimation } from '../hooks/useAnimation';
 
 const TABS = ['Stats', 'Countries', 'Regions', 'Municipalities', 'Flags', 'Generate NFT', 'Demo User', 'Utilities'];
 
@@ -107,6 +108,10 @@ const Admin = () => {
   const handleAuth = () => dispatch(authenticate(adminKey));
   const handleLogout = () => dispatch(logout());
 
+  // Animation hooks
+  const headerRef = usePageLoadAnimation(100);
+  const { ref: contentRef } = useAnimation({ threshold: 0.1 });
+
   // ==========================================================================
   // AUTHENTICATION SCREEN
   // ==========================================================================
@@ -114,9 +119,28 @@ const Admin = () => {
     return (
       <div className="page-container">
         <div className="max-w-md mx-auto py-20">
-          <div className="card p-8">
-            <h1 className="text-2xl font-bold text-white mb-2 text-center">Admin Panel</h1>
-            <p className="text-gray-400 text-center mb-6">Enter your admin API key to continue</p>
+          <div
+            className="card p-8"
+            data-animate="zoom-in"
+            data-duration="normal"
+            data-delay="0"
+          >
+            <h1
+              className="text-2xl font-bold text-white mb-2 text-center"
+              data-animate="fade-down"
+              data-duration="fast"
+              data-delay="1"
+            >
+              Admin Panel
+            </h1>
+            <p
+              className="text-gray-400 text-center mb-6"
+              data-animate="fade-up"
+              data-duration="fast"
+              data-delay="2"
+            >
+              Enter your admin API key to continue
+            </p>
             <input
               type="password"
               value={adminKey}
@@ -124,8 +148,18 @@ const Admin = () => {
               placeholder="Admin API Key"
               className="input mb-4"
               onKeyDown={(e) => e.key === 'Enter' && handleAuth()}
+              data-animate="fade-up"
+              data-duration="fast"
+              data-delay="3"
             />
-            <button onClick={handleAuth} disabled={loading} className="btn btn-primary w-full">
+            <button
+              onClick={handleAuth}
+              disabled={loading}
+              className="btn btn-primary w-full"
+              data-animate="fade-up"
+              data-duration="fast"
+              data-delay="4"
+            >
               {loading ? 'Authenticating...' : 'Access Admin'}
             </button>
             {error && <p className="text-red-400 text-sm text-center mt-4">{error}</p>}
@@ -141,31 +175,60 @@ const Admin = () => {
   return (
     <div className="page-container">
       {/* Header */}
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="page-title">Admin Panel</h1>
-        <button onClick={handleLogout} className="btn btn-secondary">
+      <div ref={headerRef} className="flex justify-between items-center mb-6">
+        <h1
+          className="page-title"
+          data-animate="fade-right"
+          data-duration="normal"
+          data-delay="0"
+        >
+          Admin Panel
+        </h1>
+        <button
+          onClick={handleLogout}
+          className="btn btn-secondary"
+          data-animate="fade-left"
+          data-duration="fast"
+          data-delay="1"
+        >
           Logout
         </button>
       </div>
 
       {/* Messages */}
       {message && (
-        <div className="mb-6 p-4 bg-green-600/20 border border-green-600/50 rounded-lg text-green-400">
+        <div
+          className="mb-6 p-4 bg-green-600/20 border border-green-600/50 rounded-lg text-green-400"
+          data-animate="fade-down"
+          data-duration="fast"
+        >
           {message}
         </div>
       )}
       {error && (
-        <div className="mb-6 p-4 bg-red-600/20 border border-red-600/50 rounded-lg text-red-400">
+        <div
+          className="mb-6 p-4 bg-red-600/20 border border-red-600/50 rounded-lg text-red-400"
+          data-animate="fade-down"
+          data-duration="fast"
+        >
           {error}
         </div>
       )}
 
       {/* Tabs */}
-      <div className="flex gap-2 mb-6 overflow-x-auto pb-2">
-        {TABS.map((tab) => (
+      <div
+        className="flex gap-2 mb-6 overflow-x-auto pb-2"
+        data-animate="fade-up"
+        data-duration="normal"
+        data-delay="2"
+      >
+        {TABS.map((tab, index) => (
           <button
             key={tab}
             onClick={() => setActiveTab(tab)}
+            data-animate="fade-up"
+            data-duration="fast"
+            data-delay={String(index % 8)}
             className={`px-4 py-2 rounded-lg font-medium transition-colors whitespace-nowrap ${
               activeTab === tab
                 ? 'bg-primary text-white'
@@ -178,7 +241,8 @@ const Admin = () => {
       </div>
 
       {/* Tab Content */}
-      {activeTab === 'Stats' && <StatsTab stats={stats} />}
+      <div ref={contentRef}>
+        {activeTab === 'Stats' && <StatsTab stats={stats} />}
       {activeTab === 'Countries' && (
         <CountriesTab
           countries={countries}
@@ -234,6 +298,7 @@ const Admin = () => {
           loading={loading}
         />
       )}
+      </div>
     </div>
   );
 };

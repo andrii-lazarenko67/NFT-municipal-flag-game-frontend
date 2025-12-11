@@ -5,11 +5,15 @@ import { Link, useLocation } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import { connectWallet, disconnect, selectWallet } from '../store/slices/walletSlice';
 import config from '../config';
+import { usePageLoadAnimation, animationPatterns } from '../hooks/useAnimation';
 
 const Header = () => {
   const location = useLocation();
   const dispatch = useDispatch();
   const { address, balance, isConnected, isConnecting, isMetaMaskInstalled } = useSelector(selectWallet);
+
+  // Animation hook for header load animation
+  const headerRef = usePageLoadAnimation(50);
 
   const isActive = (path) => location.pathname === path;
 
@@ -17,11 +21,17 @@ const Header = () => {
   const handleDisconnect = () => dispatch(disconnect());
 
   return (
-    <header className="bg-dark border-b border-gray-800 sticky top-0 z-50">
+    <header ref={headerRef} className="bg-dark border-b border-gray-800 sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
-          <Link to="/" className="flex items-center gap-2 text-white hover:text-primary transition-colors">
+          <Link
+            to="/"
+            className="flex items-center gap-2 text-white hover:text-primary transition-colors"
+            data-animate="fade-right"
+            data-duration="fast"
+            data-delay="0"
+          >
             <svg
               className="w-8 h-8"
               viewBox="0 0 32 32"
@@ -54,15 +64,20 @@ const Header = () => {
 
           {/* Navigation */}
           <nav className="hidden md:flex items-center gap-1">
-            <NavLink to="/countries" active={isActive('/countries')}>Explore</NavLink>
-            <NavLink to="/auctions" active={isActive('/auctions')}>Auctions</NavLink>
-            <NavLink to="/rankings" active={isActive('/rankings')}>Rankings</NavLink>
-            <NavLink to="/profile" active={isActive('/profile')}>Profile</NavLink>
-            <NavLink to="/admin" active={isActive('/admin')}>Admin</NavLink>
+            <NavLink to="/countries" active={isActive('/countries')} index={0}>Explore</NavLink>
+            <NavLink to="/auctions" active={isActive('/auctions')} index={1}>Auctions</NavLink>
+            <NavLink to="/rankings" active={isActive('/rankings')} index={2}>Rankings</NavLink>
+            <NavLink to="/profile" active={isActive('/profile')} index={3}>Profile</NavLink>
+            <NavLink to="/admin" active={isActive('/admin')} index={4}>Admin</NavLink>
           </nav>
 
           {/* Wallet Section */}
-          <div className="flex items-center gap-3">
+          <div
+            className="flex items-center gap-3"
+            data-animate="fade-left"
+            data-duration="fast"
+            data-delay="3"
+          >
             {!isMetaMaskInstalled ? (
               <a
                 href="https://metamask.io/download/"
@@ -113,9 +128,10 @@ const Header = () => {
   );
 };
 
-const NavLink = ({ to, active, children }) => (
+const NavLink = ({ to, active, children, index = 0 }) => (
   <Link
     to={to}
+    {...animationPatterns.nav(index)}
     className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
       active
         ? 'bg-primary/20 text-primary'

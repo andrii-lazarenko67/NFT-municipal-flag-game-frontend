@@ -9,6 +9,7 @@ import { fetchUserData, selectUserProfile, selectUserFlags, selectUserInterests,
 import Loading from '../components/Loading';
 import config from '../config';
 import api from '../services/api';
+import { useAnimation, usePageLoadAnimation, animationPatterns } from '../hooks/useAnimation';
 
 const Profile = () => {
   const dispatch = useDispatch();
@@ -18,6 +19,12 @@ const Profile = () => {
   const flags = useSelector(selectUserFlags);
   const interests = useSelector(selectUserInterests);
   const loading = useSelector(selectUserLoading);
+
+  // Animation hooks
+  const headerRef = usePageLoadAnimation(100);
+  const { ref: statsRef } = useAnimation({ threshold: 0.2 });
+  const { ref: flagsRef } = useAnimation({ threshold: 0.1 });
+  const { ref: interestsRef } = useAnimation({ threshold: 0.1 });
 
   const [showAuctionModal, setShowAuctionModal] = useState(false);
   const [selectedFlag, setSelectedFlag] = useState(null);
@@ -91,7 +98,11 @@ const Profile = () => {
     return (
       <div className="page-container">
         <div className="max-w-md mx-auto text-center py-20">
-          <div className="card p-8">
+          <div
+            data-animate="zoom-in"
+            data-duration="slow"
+            className="card p-8"
+          >
             <h2 className="text-2xl font-bold text-white mb-4">Connect Your Wallet</h2>
             <p className="text-gray-400 mb-6">Please connect your wallet to view your profile</p>
             <button onClick={handleConnect} className="btn btn-primary">
@@ -107,48 +118,95 @@ const Profile = () => {
 
   return (
     <div className="page-container">
-      <div className="page-header">
-        <h1 className="page-title">My Profile</h1>
-        <p className="text-gray-400 font-mono">{config.truncateAddress(address, 8)}</p>
+      <div ref={headerRef} className="page-header">
+        <h1
+          data-animate="fade-down"
+          data-duration="normal"
+          data-delay="0"
+          className="page-title"
+        >
+          My Profile
+        </h1>
+        <p
+          data-animate="fade-up"
+          data-duration="normal"
+          data-delay="1"
+          className="text-gray-400 font-mono"
+        >
+          {config.truncateAddress(address, 8)}
+        </p>
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-        <div className="stat-card">
+      <div ref={statsRef} className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+        <div
+          data-animate="flip-up"
+          data-duration="normal"
+          data-delay="0"
+          className="stat-card"
+        >
           <span className="stat-value">{profile?.reputation_score || 0}</span>
           <span className="stat-label">Reputation</span>
         </div>
-        <div className="stat-card">
+        <div
+          data-animate="flip-up"
+          data-duration="normal"
+          data-delay="1"
+          className="stat-card"
+        >
           <span className="stat-value">{flags.length}</span>
           <span className="stat-label">Flags Owned</span>
         </div>
-        <div className="stat-card">
+        <div
+          data-animate="flip-up"
+          data-duration="normal"
+          data-delay="2"
+          className="stat-card"
+        >
           <span className="stat-value">{interests.length}</span>
           <span className="stat-label">Interests</span>
         </div>
-        <div className="stat-card">
+        <div
+          data-animate="flip-up"
+          data-duration="normal"
+          data-delay="3"
+          className="stat-card"
+        >
           <span className="stat-value">{profile?.followers_count || 0}</span>
           <span className="stat-label">Followers</span>
         </div>
       </div>
 
       {/* My Flags */}
-      <section className="mb-8">
-        <h2 className="text-xl font-bold text-white mb-4">My Flags ({flags.length})</h2>
+      <section ref={flagsRef} className="mb-8">
+        <h2
+          data-animate="fade-right"
+          data-duration="normal"
+          data-delay="0"
+          className="text-xl font-bold text-white mb-4"
+        >
+          My Flags ({flags.length})
+        </h2>
         {flags.length > 0 ? (
-          <div className="card divide-y divide-gray-800">
-            {flags.map((ownership) => {
+          <div
+            data-animate="fade-up"
+            data-duration="normal"
+            data-delay="1"
+            className="card divide-y divide-gray-800"
+          >
+            {flags.map((ownership, index) => {
               const hasAuction = hasActiveAuction(ownership.flag_id);
               return (
                 <div
                   key={ownership.id}
+                  {...animationPatterns.list(index)}
                   className="flex items-center justify-between p-4 hover:bg-gray-800/50 transition-colors"
                 >
                   <Link to={`/flags/${ownership.flag_id}`} className="flex-1">
                     <span className="text-white">Flag #{ownership.flag_id}</span>
                     <span className="badge badge-available ml-2">{ownership.ownership_type}</span>
                     {hasAuction && (
-                      <span className="badge bg-yellow-600 text-white ml-2">🔨 In Auction</span>
+                      <span className="badge bg-yellow-600 text-white ml-2">In Auction</span>
                     )}
                   </Link>
                   <button
@@ -163,24 +221,41 @@ const Profile = () => {
             })}
           </div>
         ) : (
-          <div className="card p-8 text-center">
+          <div
+            data-animate="fade-up"
+            data-duration="slow"
+            className="card p-8 text-center"
+          >
             <p className="text-gray-500">You don't own any flags yet</p>
             <Link to="/countries" className="text-primary hover:text-primary-light mt-2 inline-block">
-              Start exploring →
+              Start exploring
             </Link>
           </div>
         )}
       </section>
 
       {/* My Interests */}
-      <section>
-        <h2 className="text-xl font-bold text-white mb-4">My Interests ({interests.length})</h2>
+      <section ref={interestsRef}>
+        <h2
+          data-animate="fade-right"
+          data-duration="normal"
+          data-delay="0"
+          className="text-xl font-bold text-white mb-4"
+        >
+          My Interests ({interests.length})
+        </h2>
         {interests.length > 0 ? (
-          <div className="card divide-y divide-gray-800">
-            {interests.map((interest) => (
+          <div
+            data-animate="fade-up"
+            data-duration="normal"
+            data-delay="1"
+            className="card divide-y divide-gray-800"
+          >
+            {interests.map((interest, index) => (
               <Link
                 key={interest.id}
                 to={`/flags/${interest.flag_id}`}
+                {...animationPatterns.list(index)}
                 className="flex items-center justify-between p-4 hover:bg-gray-800/50 transition-colors"
               >
                 <span className="text-white">Flag #{interest.flag_id}</span>
@@ -191,7 +266,11 @@ const Profile = () => {
             ))}
           </div>
         ) : (
-          <div className="card p-8 text-center">
+          <div
+            data-animate="fade-up"
+            data-duration="slow"
+            className="card p-8 text-center"
+          >
             <p className="text-gray-500">You haven't shown interest in any flags</p>
           </div>
         )}
@@ -200,7 +279,11 @@ const Profile = () => {
       {/* Create Auction Modal */}
       {showAuctionModal && (
         <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 p-4">
-          <div className="card max-w-md w-full p-6">
+          <div
+            data-animate="zoom-in"
+            data-duration="fast"
+            className="card max-w-md w-full p-6 animate"
+          >
             <h3 className="text-xl font-bold text-white mb-4">Create Auction</h3>
             <p className="text-gray-400 mb-4">Flag #{selectedFlag?.flag_id}</p>
 

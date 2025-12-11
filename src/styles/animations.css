@@ -1,0 +1,402 @@
+/* ============================================================
+   STAGGERED ITEM ANIMATIONS
+   ============================================================
+   Animation system for Municipal Flag NFT Game
+   - Multiple animation directions
+   - Variable durations
+   - Staggered delays for sequential reveals
+   ============================================================ */
+
+/* ============================================================
+   BASE ANIMATION SETUP
+   ============================================================ */
+
+/* Elements start hidden and animate in when .animate class is added */
+[data-animate] {
+  opacity: 0;
+  will-change: transform, opacity;
+}
+
+[data-animate].animate {
+  animation-fill-mode: forwards;
+}
+
+/* ============================================================
+   ANIMATION DIRECTIONS
+   ============================================================ */
+
+/* Fade Up - Element fades in while moving upward */
+[data-animate="fade-up"] {
+  transform: translateY(40px);
+}
+[data-animate="fade-up"].animate {
+  animation-name: fadeUp;
+}
+
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(40px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Fade Down - Element fades in while moving downward */
+[data-animate="fade-down"] {
+  transform: translateY(-40px);
+}
+[data-animate="fade-down"].animate {
+  animation-name: fadeDown;
+}
+
+@keyframes fadeDown {
+  from {
+    opacity: 0;
+    transform: translateY(-40px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Fade Left - Element fades in while moving from right to left */
+[data-animate="fade-left"] {
+  transform: translateX(40px);
+}
+[data-animate="fade-left"].animate {
+  animation-name: fadeLeft;
+}
+
+@keyframes fadeLeft {
+  from {
+    opacity: 0;
+    transform: translateX(40px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Fade Right - Element fades in while moving from left to right */
+[data-animate="fade-right"] {
+  transform: translateX(-40px);
+}
+[data-animate="fade-right"].animate {
+  animation-name: fadeRight;
+}
+
+@keyframes fadeRight {
+  from {
+    opacity: 0;
+    transform: translateX(-40px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Zoom In - Element scales up from smaller size */
+[data-animate="zoom-in"] {
+  transform: scale(0.8);
+}
+[data-animate="zoom-in"].animate {
+  animation-name: zoomIn;
+}
+
+@keyframes zoomIn {
+  from {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Zoom Out - Element scales down from larger size */
+[data-animate="zoom-out"] {
+  transform: scale(1.2);
+}
+[data-animate="zoom-out"].animate {
+  animation-name: zoomOut;
+}
+
+@keyframes zoomOut {
+  from {
+    opacity: 0;
+    transform: scale(1.2);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Flip Up - Element rotates in from bottom */
+[data-animate="flip-up"] {
+  transform: perspective(1000px) rotateX(45deg);
+  transform-origin: bottom center;
+}
+[data-animate="flip-up"].animate {
+  animation-name: flipUp;
+}
+
+@keyframes flipUp {
+  from {
+    opacity: 0;
+    transform: perspective(1000px) rotateX(45deg);
+  }
+  to {
+    opacity: 1;
+    transform: perspective(1000px) rotateX(0deg);
+  }
+}
+
+/* Flip Down - Element rotates in from top */
+[data-animate="flip-down"] {
+  transform: perspective(1000px) rotateX(-45deg);
+  transform-origin: top center;
+}
+[data-animate="flip-down"].animate {
+  animation-name: flipDown;
+}
+
+@keyframes flipDown {
+  from {
+    opacity: 0;
+    transform: perspective(1000px) rotateX(-45deg);
+  }
+  to {
+    opacity: 1;
+    transform: perspective(1000px) rotateX(0deg);
+  }
+}
+
+/* Fade - Simple fade in */
+[data-animate="fade"] {
+  transform: none;
+}
+[data-animate="fade"].animate {
+  animation-name: fadeIn;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Slide Up - Larger slide distance */
+[data-animate="slide-up"] {
+  transform: translateY(80px);
+}
+[data-animate="slide-up"].animate {
+  animation-name: slideUp;
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(80px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Bounce In */
+[data-animate="bounce-in"] {
+  transform: scale(0.3);
+}
+[data-animate="bounce-in"].animate {
+  animation-name: bounceIn;
+}
+
+@keyframes bounceIn {
+  0% {
+    opacity: 0;
+    transform: scale(0.3);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.05);
+  }
+  70% {
+    transform: scale(0.95);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* ============================================================
+   ANIMATION DURATIONS
+   ============================================================ */
+
+[data-duration="very-fast"].animate {
+  animation-duration: 200ms;
+}
+
+[data-duration="fast"].animate {
+  animation-duration: 400ms;
+}
+
+[data-duration="normal"].animate {
+  animation-duration: 600ms;
+}
+
+[data-duration="light-slow"].animate {
+  animation-duration: 800ms;
+}
+
+[data-duration="slow"].animate {
+  animation-duration: 1000ms;
+}
+
+[data-duration="very-slow"].animate {
+  animation-duration: 1200ms;
+}
+
+/* Default duration if not specified */
+[data-animate].animate:not([data-duration]) {
+  animation-duration: 600ms;
+}
+
+/* ============================================================
+   ANIMATION DELAYS (for staggered effects)
+   ============================================================ */
+
+[data-delay="0"].animate { animation-delay: 0ms; }
+[data-delay="1"].animate { animation-delay: 100ms; }
+[data-delay="2"].animate { animation-delay: 200ms; }
+[data-delay="3"].animate { animation-delay: 300ms; }
+[data-delay="4"].animate { animation-delay: 400ms; }
+[data-delay="5"].animate { animation-delay: 500ms; }
+[data-delay="6"].animate { animation-delay: 600ms; }
+[data-delay="7"].animate { animation-delay: 700ms; }
+[data-delay="8"].animate { animation-delay: 800ms; }
+[data-delay="9"].animate { animation-delay: 900ms; }
+[data-delay="10"].animate { animation-delay: 1000ms; }
+[data-delay="11"].animate { animation-delay: 1100ms; }
+[data-delay="12"].animate { animation-delay: 1200ms; }
+
+/* ============================================================
+   ANIMATION TIMING FUNCTIONS
+   ============================================================ */
+
+[data-easing="ease"].animate {
+  animation-timing-function: ease;
+}
+
+[data-easing="ease-in"].animate {
+  animation-timing-function: ease-in;
+}
+
+[data-easing="ease-out"].animate {
+  animation-timing-function: ease-out;
+}
+
+[data-easing="ease-in-out"].animate {
+  animation-timing-function: ease-in-out;
+}
+
+[data-easing="spring"].animate {
+  animation-timing-function: cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+/* Default timing function */
+[data-animate].animate:not([data-easing]) {
+  animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ============================================================
+   SPECIAL ANIMATION COMBINATIONS
+   ============================================================ */
+
+/* Hero animations - more dramatic */
+.hero-animate {
+  opacity: 0;
+}
+.hero-animate.animate {
+  animation: heroEntrance 1s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes heroEntrance {
+  from {
+    opacity: 0;
+    transform: translateY(60px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* Card hover enhancement */
+.card-animate {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+.card-animate:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+}
+
+/* Stagger group - parent container */
+.stagger-group [data-animate] {
+  --stagger-delay: 0;
+}
+.stagger-group [data-animate]:nth-child(1) { --stagger-delay: 0; }
+.stagger-group [data-animate]:nth-child(2) { --stagger-delay: 1; }
+.stagger-group [data-animate]:nth-child(3) { --stagger-delay: 2; }
+.stagger-group [data-animate]:nth-child(4) { --stagger-delay: 3; }
+.stagger-group [data-animate]:nth-child(5) { --stagger-delay: 4; }
+.stagger-group [data-animate]:nth-child(6) { --stagger-delay: 5; }
+.stagger-group [data-animate]:nth-child(7) { --stagger-delay: 6; }
+.stagger-group [data-animate]:nth-child(8) { --stagger-delay: 7; }
+
+.stagger-group [data-animate].animate {
+  animation-delay: calc(var(--stagger-delay) * 100ms);
+}
+
+/* ============================================================
+   REDUCE MOTION PREFERENCE
+   ============================================================ */
+
+@media (prefers-reduced-motion: reduce) {
+  [data-animate],
+  [data-animate].animate,
+  .hero-animate,
+  .hero-animate.animate {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+}
+
+/* ============================================================
+   UTILITY CLASSES
+   ============================================================ */
+
+/* Immediately visible (skip animation) */
+.no-animate {
+  opacity: 1 !important;
+  transform: none !important;
+  animation: none !important;
+}
+
+/* Force animation restart */
+.animate-restart {
+  animation: none;
+}

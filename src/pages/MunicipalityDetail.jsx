@@ -7,12 +7,17 @@ import { useSelector, useDispatch } from 'react-redux';
 import { fetchMunicipality, selectCurrentMunicipality, selectCountriesLoading } from '../store/slices/countriesSlice';
 import FlagCard from '../components/FlagCard';
 import Loading from '../components/Loading';
+import { useAnimation, usePageLoadAnimation, animationPatterns } from '../hooks/useAnimation';
 
 const MunicipalityDetail = () => {
   const { id } = useParams();
   const dispatch = useDispatch();
   const municipality = useSelector(selectCurrentMunicipality);
   const loading = useSelector(selectCountriesLoading);
+
+  // Animation hooks
+  const headerRef = usePageLoadAnimation(100);
+  const { ref: gridRef } = useAnimation({ threshold: 0.1 });
 
   useEffect(() => {
     dispatch(fetchMunicipality(id));
@@ -23,27 +28,68 @@ const MunicipalityDetail = () => {
 
   return (
     <div className="page-container">
-      <nav className="breadcrumb">
-        <Link to="/countries">Countries</Link>
-        <span>/</span>
-        <Link to={`/regions/${municipality.region?.id}`}>{municipality.region?.name}</Link>
-        <span>/</span>
-        <span className="text-white">{municipality.name}</span>
+      <nav ref={headerRef} className="breadcrumb">
+        <Link
+          to="/countries"
+          data-animate="fade-right"
+          data-duration="fast"
+          data-delay="0"
+        >
+          Countries
+        </Link>
+        <span data-animate="fade" data-duration="fast" data-delay="1">/</span>
+        <Link
+          to={`/regions/${municipality.region?.id}`}
+          data-animate="fade-right"
+          data-duration="fast"
+          data-delay="1"
+        >
+          {municipality.region?.name}
+        </Link>
+        <span data-animate="fade" data-duration="fast" data-delay="2">/</span>
+        <span
+          data-animate="fade-left"
+          data-duration="fast"
+          data-delay="3"
+          className="text-white"
+        >
+          {municipality.name}
+        </span>
       </nav>
 
       <div className="page-header">
-        <h1 className="page-title">{municipality.name}</h1>
-        <p className="page-subtitle font-mono">{municipality.coordinates}</p>
+        <h1
+          data-animate="fade-down"
+          data-duration="normal"
+          data-delay="1"
+          className="page-title"
+        >
+          {municipality.name}
+        </h1>
+        <p
+          data-animate="fade-up"
+          data-duration="normal"
+          data-delay="2"
+          className="page-subtitle font-mono"
+        >
+          {municipality.coordinates}
+        </p>
       </div>
 
-      <div className="grid-cards">
-        {municipality.flags?.map((flag) => (
-          <FlagCard key={flag.id} flag={flag} />
+      <div ref={gridRef} className="grid-cards">
+        {municipality.flags?.map((flag, index) => (
+          <div key={flag.id} {...animationPatterns.cards(index)}>
+            <FlagCard flag={flag} />
+          </div>
         ))}
       </div>
 
       {(!municipality.flags || municipality.flags.length === 0) && (
-        <div className="text-center py-16">
+        <div
+          data-animate="fade-up"
+          data-duration="slow"
+          className="text-center py-16"
+        >
           <p className="text-gray-400">No flags available in this municipality.</p>
         </div>
       )}
@@ -53,7 +99,11 @@ const MunicipalityDetail = () => {
 
 const ErrorDisplay = ({ message }) => (
   <div className="page-container">
-    <div className="text-center py-16">
+    <div
+      data-animate="zoom-in"
+      data-duration="fast"
+      className="text-center py-16"
+    >
       <p className="text-red-400">{message}</p>
     </div>
   </div>
