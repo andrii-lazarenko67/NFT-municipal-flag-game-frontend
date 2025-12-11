@@ -22,7 +22,33 @@ const Header = () => {
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
           <Link to="/" className="flex items-center gap-2 text-white hover:text-primary transition-colors">
-            <span className="text-2xl">🏴</span>
+            <svg
+              className="w-8 h-8"
+              viewBox="0 0 32 32"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              {/* Flag pole */}
+              <rect x="4" y="2" width="2.5" height="28" rx="1" fill="#A78BFA" />
+              {/* Flag pole top */}
+              <circle cx="5.25" cy="3" r="2" fill="#C4B5FD" />
+              {/* Flag body with wave effect */}
+              <path
+                d="M8 4C8 4 10 3 14 4C18 5 22 6 26 5C28 4.5 29 5 29 6V16C29 17 28 17.5 26 17C22 16 18 17 14 16C10 15 8 16 8 16V4Z"
+                fill="url(#flagGradient)"
+              />
+              {/* Flag highlight */}
+              <path
+                d="M8 4C8 4 10 3 14 4C18 5 22 6 26 5C28 4.5 29 5 29 6V8C28 8.5 26 9 22 8C18 7 14 6 10 7C8 7.5 8 7 8 7V4Z"
+                fill="rgba(255,255,255,0.2)"
+              />
+              <defs>
+                <linearGradient id="flagGradient" x1="8" y1="4" x2="29" y2="16" gradientUnits="userSpaceOnUse">
+                  <stop stopColor="#8B5CF6" />
+                  <stop offset="1" stopColor="#6366F1" />
+                </linearGradient>
+              </defs>
+            </svg>
             <span className="font-bold text-lg hidden sm:inline">Municipal Flag NFT</span>
           </Link>
 
