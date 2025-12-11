@@ -159,7 +159,7 @@ export const getFollowing = (walletAddress) =>
   api.get(`/users/${walletAddress}/following`);
 
 // =============================================================================
-// AUCTIONS
+// AUCTIONS (Enhanced with min_price, buyout_price, bidder_category)
 // =============================================================================
 
 export const getAuctions = (activeOnly = true, flagId = null) =>
@@ -168,13 +168,48 @@ export const getAuctions = (activeOnly = true, flagId = null) =>
 export const getAuction = (id) =>
   api.get(`/auctions/${id}`);
 
+/**
+ * Create a new auction with enhanced features.
+ * @param {Object} data - Auction data
+ * @param {number} data.flag_id - ID of the flag to auction
+ * @param {string} data.wallet_address - Seller's wallet address
+ * @param {string|number} data.starting_price - Starting price in MATIC
+ * @param {string|number} data.min_price - Minimum bid price (floor)
+ * @param {string|number|null} data.buyout_price - Optional instant purchase price
+ * @param {number} data.duration_hours - Auction duration (1-168 hours)
+ */
 export const createAuction = (data) =>
-  api.post('/auctions', data);
+  api.post('/auctions', {
+    flag_id: data.flag_id,
+    wallet_address: data.wallet_address,
+    starting_price: data.starting_price.toString(),
+    min_price: data.min_price.toString(),
+    buyout_price: data.buyout_price ? data.buyout_price.toString() : null,
+    duration_hours: data.duration_hours,
+  });
 
-export const placeBid = (auctionId, walletAddress, amount) =>
+/**
+ * Place a bid on an auction with category for tie-breaking.
+ * @param {number} auctionId - Auction ID
+ * @param {string} walletAddress - Bidder's wallet address
+ * @param {string|number} amount - Bid amount in MATIC
+ * @param {string} bidderCategory - Bidder's category ('standard', 'plus', 'premium')
+ */
+export const placeBid = (auctionId, walletAddress, amount, bidderCategory = 'standard') =>
   api.post(`/auctions/${auctionId}/bid`, {
     wallet_address: walletAddress,
     amount: amount.toString(),
+    bidder_category: bidderCategory,
+  });
+
+/**
+ * Instant buyout of an auction at the buyout price.
+ * @param {number} auctionId - Auction ID
+ * @param {string} walletAddress - Buyer's wallet address
+ */
+export const buyoutAuction = (auctionId, walletAddress) =>
+  api.post(`/auctions/${auctionId}/buyout`, {
+    wallet_address: walletAddress,
   });
 
 export const closeAuction = (auctionId) =>
@@ -222,5 +257,91 @@ export const getIpfsStatus = (adminKey) =>
 
 export const healthCheck = () =>
   api.get('/admin/health');
+
+// =============================================================================
+// DEMO USER
+// =============================================================================
+
+/**
+ * Create a demo user for testing and presentation.
+ * @param {string} adminKey - Admin API key
+ * @param {Object} data - Optional demo user data
+ * @param {string} data.wallet_address - Demo wallet address (default provided)
+ * @param {string} data.username - Demo username
+ * @param {number} data.reputation_score - Initial reputation score
+ */
+export const createDemoUser = (adminKey, data = {}) =>
+  api.post('/admin/create-demo-user', data, { headers: { 'X-Admin-Key': adminKey } });
+
+/**
+ * Get the demo user details.
+ * @param {string} adminKey - Admin API key
+ * @param {string} walletAddress - Demo wallet address
+ */
+export const getDemoUser = (adminKey, walletAddress = '0xdemo000000000000000000000000000000000001') =>
+  api.get('/admin/demo-user', {
+    params: { wallet_address: walletAddress },
+    headers: { 'X-Admin-Key': adminKey }
+  });
+
+/**
+ * Seed demo user with flag ownerships.
+ * @param {string} adminKey - Admin API key
+ * @param {Object} data - Ownership seeding data
+ * @param {number} data.user_id - Demo user ID
+ * @param {number} data.flag_count - Number of flags to assign (default 5)
+ * @param {string[]} data.include_categories - Flag categories to include
+ */
+export const seedDemoOwnership = (adminKey, data) =>
+  api.post('/admin/seed-demo-ownership', data, { headers: { 'X-Admin-Key': adminKey } });
+
+/**
+ * Delete the demo user and all associated data.
+ * @param {string} adminKey - Admin API key
+ * @param {string} walletAddress - Demo wallet address
+ */
+export const deleteDemoUser = (adminKey, walletAddress = '0xdemo000000000000000000000000000000000001') =>
+  api.delete('/admin/demo-user', {
+    params: { wallet_address: walletAddress },
+    headers: { 'X-Admin-Key': adminKey }
+  });
+
+// =============================================================================
+// COORDINATE TO NFT GENERATION
+// =============================================================================
+
+/**
+ * Generate an NFT from geographic coordinates.
+ * This triggers the full pipeline: Street View → AI Transform → IPFS → Database
+ *
+ * @param {string} adminKey - Admin API key
+ * @param {Object} data - NFT generation data
+ * @param {number} data.latitude - Latitude (-90 to 90)
+ * @param {number} data.longitude - Longitude (-180 to 180)
+ * @param {number} data.municipality_id - Municipality ID
+ * @param {string} data.location_type - Location type (e.g., "Town Hall")
+ * @param {string} data.category - Flag category (standard, plus, premium)
+ * @param {number} data.nfts_required - Number of NFTs required (1-10)
+ * @param {string} data.custom_name - Optional custom flag name
+ * @param {string} data.custom_prompt - Optional custom AI prompt
+ * @param {number} data.heading - Optional Street View camera heading (0-360)
+ */
+export const createNFTFromCoordinates = (adminKey, data) =>
+  api.post('/admin/nft-from-coordinates', data, {
+    headers: { 'X-Admin-Key': adminKey },
+    timeout: 180000 // 3 minute timeout for AI generation
+  });
+
+/**
+ * Check if Street View imagery is available at coordinates.
+ * @param {string} adminKey - Admin API key
+ * @param {number} latitude - Latitude
+ * @param {number} longitude - Longitude
+ */
+export const checkStreetViewAvailability = (adminKey, latitude, longitude) =>
+  api.post('/admin/check-street-view', null, {
+    params: { latitude, longitude },
+    headers: { 'X-Admin-Key': adminKey }
+  });
 
 export default api;

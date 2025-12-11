@@ -1,5 +1,11 @@
 /**
  * Auction Detail Page - View auction details and place bids
+ *
+ * ENHANCED FEATURES:
+ * - Displays min_price (floor price)
+ * - Displays buyout_price with instant buyout button
+ * - Bidder category selection for tie-breaking
+ * - Shows winner_category for closed auctions
  */
 import { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
@@ -7,8 +13,10 @@ import { useSelector, useDispatch } from 'react-redux';
 import {
   fetchAuction,
   placeBid,
+  buyoutAuction,
   selectCurrentAuction,
   selectAuctionsLoading,
+  selectActionLoading,
   clearCurrentAuction,
 } from '../store/slices/auctionsSlice';
 import { selectAddress, selectIsConnected, connectWallet } from '../store/slices/walletSlice';
@@ -20,11 +28,14 @@ const AuctionDetail = () => {
   const dispatch = useDispatch();
   const auction = useSelector(selectCurrentAuction);
   const loading = useSelector(selectAuctionsLoading);
+  const actionLoading = useSelector(selectActionLoading);
   const address = useSelector(selectAddress);
   const isConnected = useSelector(selectIsConnected);
 
   const [bidAmount, setBidAmount] = useState('');
+  const [bidderCategory, setBidderCategory] = useState('standard');
   const [bidding, setBidding] = useState(false);
+  const [buyingOut, setBuyingOut] = useState(false);
 
   useEffect(() => {
     dispatch(fetchAuction(id));
@@ -44,12 +55,19 @@ const AuctionDetail = () => {
       return;
     }
 
+    // Validate bid amount against min_price
+    if (parseFloat(bidAmount) < parseFloat(auction.min_price)) {
+      alert(`Bid must be at least ${config.formatPrice(auction.min_price)} POL (minimum price)`);
+      return;
+    }
+
     setBidding(true);
     try {
       await dispatch(placeBid({
         auctionId: parseInt(id),
         walletAddress: address,
-        amount: parseFloat(bidAmount)
+        amount: parseFloat(bidAmount),
+        bidderCategory: bidderCategory,
       })).unwrap();
 
       alert('Bid placed successfully!');
@@ -58,6 +76,31 @@ const AuctionDetail = () => {
       alert(error || 'Failed to place bid');
     } finally {
       setBidding(false);
+    }
+  };
+
+  const handleBuyout = async () => {
+    if (!isConnected) {
+      alert('Please connect your wallet first');
+      return;
+    }
+
+    if (!window.confirm(`Are you sure you want to buyout this auction for ${config.formatPrice(auction.buyout_price)} POL?`)) {
+      return;
+    }
+
+    setBuyingOut(true);
+    try {
+      await dispatch(buyoutAuction({
+        auctionId: parseInt(id),
+        walletAddress: address,
+      })).unwrap();
+
+      alert('Buyout successful! You now own this flag.');
+    } catch (error) {
+      alert(error || 'Failed to buyout auction');
+    } finally {
+      setBuyingOut(false);
     }
   };
 
@@ -84,7 +127,11 @@ const AuctionDetail = () => {
   const timeRemaining = new Date(auction.ends_at) - new Date();
   const isEnded = timeRemaining <= 0 || auction.status !== 'active';
   const isSeller = address?.toLowerCase() === auction.seller?.wallet_address?.toLowerCase();
-  const minBid = auction.current_highest_bid || auction.starting_price;
+  const currentHighestBid = auction.current_highest_bid || auction.starting_price;
+  const minBidAmount = Math.max(
+    parseFloat(auction.min_price),
+    parseFloat(currentHighestBid) + 0.001
+  );
 
   const formatTimeRemaining = () => {
     if (isEnded) return 'Ended';
@@ -95,6 +142,17 @@ const AuctionDetail = () => {
     if (days > 0) return `${days}d ${hours}h`;
     if (hours > 0) return `${hours}h ${minutes}m`;
     return `${minutes}m`;
+  };
+
+  const getCategoryBadgeClass = (category) => {
+    switch (category) {
+      case 'premium':
+        return 'bg-yellow-500/20 text-yellow-400 border-yellow-500/50';
+      case 'plus':
+        return 'bg-blue-500/20 text-blue-400 border-blue-500/50';
+      default:
+        return 'bg-gray-500/20 text-gray-400 border-gray-500/50';
+    }
   };
 
   return (
@@ -109,7 +167,16 @@ const AuctionDetail = () => {
       <div className="grid lg:grid-cols-2 gap-8">
         {/* Image Section */}
         <div>
-          <div className="card overflow-hidden">
+          <div className="card overflow-hidden relative">
+            {/* Buyout Badge */}
+            {auction.buyout_price && auction.status === 'active' && (
+              <div className="absolute top-2 right-2 z-10">
+                <span className="px-3 py-1 text-sm rounded bg-yellow-500/20 text-yellow-400 border border-yellow-500/50">
+                  Buyout: {config.formatPrice(auction.buyout_price)} POL
+                </span>
+              </div>
+            )}
+
             {imageUrl ? (
               <img src={imageUrl} alt="Flag" className="w-full aspect-square object-cover" />
             ) : (
@@ -149,10 +216,15 @@ const AuctionDetail = () => {
           </h1>
 
           {/* Status Badge */}
-          <div className="mb-6">
-            <span className={`badge ${isEnded ? 'bg-gray-600' : 'bg-yellow-600'} text-white`}>
+          <div className="mb-6 flex gap-2">
+            <span className={`badge ${isEnded ? 'bg-gray-600' : 'bg-green-600'} text-white`}>
               {auction.status === 'active' ? (isEnded ? 'Time Ended' : 'Active') : auction.status}
             </span>
+            {auction.status === 'closed' && auction.winner_category && (
+              <span className={`px-2 py-1 text-xs rounded border ${getCategoryBadgeClass(auction.winner_category)}`}>
+                Winner: {auction.winner_category.charAt(0).toUpperCase() + auction.winner_category.slice(1)}
+              </span>
+            )}
           </div>
 
           {/* Auction Stats */}
@@ -165,14 +237,28 @@ const AuctionDetail = () => {
                 </span>
               </div>
               <div className="flex justify-between items-center">
+                <span className="text-gray-400">Minimum Bid:</span>
+                <span className="text-gray-300">
+                  {config.formatPrice(auction.min_price)} POL
+                </span>
+              </div>
+              {auction.buyout_price && (
+                <div className="flex justify-between items-center">
+                  <span className="text-gray-400">Buyout Price:</span>
+                  <span className="text-yellow-400 font-semibold">
+                    {config.formatPrice(auction.buyout_price)} POL
+                  </span>
+                </div>
+              )}
+              <div className="flex justify-between items-center border-t border-gray-700 pt-4">
                 <span className="text-gray-400">Current Bid:</span>
                 <span className="text-primary text-xl font-bold">
-                  {config.formatPrice(auction.current_highest_bid || auction.starting_price)} POL
+                  {config.formatPrice(currentHighestBid)} POL
                 </span>
               </div>
               <div className="flex justify-between items-center">
                 <span className="text-gray-400">Time Remaining:</span>
-                <span className={`font-semibold ${isEnded ? 'text-gray-500' : 'text-white'}`}>
+                <span className={`font-semibold ${isEnded ? 'text-gray-500' : 'text-green-400'}`}>
                   {formatTimeRemaining()}
                 </span>
               </div>
@@ -212,6 +298,29 @@ const AuctionDetail = () => {
             </div>
           )}
 
+          {/* Buyout Button */}
+          {!isEnded && auction.status === 'active' && auction.buyout_price && !isSeller && (
+            <div className="card p-6 mb-6 bg-yellow-500/10 border-yellow-500/30">
+              <h3 className="text-yellow-400 font-semibold mb-2">Instant Buyout</h3>
+              <p className="text-gray-400 text-sm mb-4">
+                Skip the bidding and purchase this flag instantly for {config.formatPrice(auction.buyout_price)} POL
+              </p>
+              {!isConnected ? (
+                <button onClick={handleConnect} className="btn bg-yellow-500 hover:bg-yellow-600 text-black w-full">
+                  Connect Wallet to Buyout
+                </button>
+              ) : (
+                <button
+                  onClick={handleBuyout}
+                  className="btn bg-yellow-500 hover:bg-yellow-600 text-black w-full"
+                  disabled={buyingOut || actionLoading}
+                >
+                  {buyingOut ? 'Processing Buyout...' : `Buyout for ${config.formatPrice(auction.buyout_price)} POL`}
+                </button>
+              )}
+            </div>
+          )}
+
           {/* Bid Form */}
           {!isEnded && auction.status === 'active' && (
             <div className="card p-6 mb-6">
@@ -234,21 +343,41 @@ const AuctionDetail = () => {
                     <input
                       type="number"
                       step="0.001"
-                      min={minBid + 0.001}
+                      min={minBidAmount}
                       required
                       value={bidAmount}
                       onChange={(e) => setBidAmount(e.target.value)}
-                      placeholder={`Min: ${config.formatPrice(minBid + 0.001)}`}
+                      placeholder={`Min: ${config.formatPrice(minBidAmount)}`}
                       className="w-full px-4 py-2 bg-dark-darker border border-gray-700 rounded-lg text-white focus:border-primary focus:outline-none"
                     />
                     <p className="text-gray-500 text-sm mt-1">
-                      Minimum bid: {config.formatPrice(minBid + 0.001)} POL
+                      Minimum bid: {config.formatPrice(minBidAmount)} POL
                     </p>
                   </div>
+
+                  {/* Bidder Category Selection */}
+                  <div>
+                    <label className="block text-sm text-gray-400 mb-2">
+                      Your Category (for tie-breaking)
+                    </label>
+                    <select
+                      value={bidderCategory}
+                      onChange={(e) => setBidderCategory(e.target.value)}
+                      className="w-full px-4 py-2 bg-dark-darker border border-gray-700 rounded-lg text-white focus:border-primary focus:outline-none"
+                    >
+                      <option value="standard">Standard</option>
+                      <option value="plus">Plus</option>
+                      <option value="premium">Premium</option>
+                    </select>
+                    <p className="text-gray-500 text-sm mt-1">
+                      Higher category wins in case of tied bids (Premium &gt; Plus &gt; Standard)
+                    </p>
+                  </div>
+
                   <button
                     type="submit"
                     className="btn btn-primary w-full"
-                    disabled={bidding}
+                    disabled={bidding || actionLoading}
                   >
                     {bidding ? 'Placing Bid...' : 'Place Bid'}
                   </button>
@@ -275,9 +404,16 @@ const AuctionDetail = () => {
             {auction.bids.map((bid) => (
               <div key={bid.id} className="p-4 flex items-center justify-between">
                 <div>
-                  <p className="text-white font-mono text-sm">
-                    {config.truncateAddress(bid.bidder?.wallet_address, 8)}
-                  </p>
+                  <div className="flex items-center gap-2">
+                    <p className="text-white font-mono text-sm">
+                      {config.truncateAddress(bid.bidder?.wallet_address, 8)}
+                    </p>
+                    {bid.bidder_category && (
+                      <span className={`px-2 py-0.5 text-xs rounded border ${getCategoryBadgeClass(bid.bidder_category)}`}>
+                        {bid.bidder_category.charAt(0).toUpperCase() + bid.bidder_category.slice(1)}
+                      </span>
+                    )}
+                  </div>
                   <p className="text-gray-500 text-sm">
                     {new Date(bid.created_at).toLocaleString()}
                   </p>
