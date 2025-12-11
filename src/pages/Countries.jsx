@@ -1,14 +1,16 @@
 /**
  * Countries Page - List all countries
+ * Refactored to use useNavigate instead of Link
  */
 import { useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import { fetchCountries, selectCountries, selectCountriesLoading, selectCountriesError } from '../store/slices/countriesSlice';
 import Loading from '../components/Loading';
 import { useAnimation, usePageLoadAnimation } from '../hooks/useAnimation';
 
 const Countries = () => {
+  const navigate = useNavigate();
   const dispatch = useDispatch();
   const countries = useSelector(selectCountries);
   const loading = useSelector(selectCountriesLoading);
@@ -53,13 +55,16 @@ const Countries = () => {
 
       <div ref={gridRef} className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
         {countries.map((country, index) => (
-          <Link
-            to={`/countries/${country.id}`}
+          <div
             key={country.id}
+            onClick={() => navigate(`/countries/${country.id}`)}
             data-animate={index % 2 === 0 ? "fade-up" : "zoom-in"}
             data-duration="normal"
             data-delay={String(index % 8)}
-            className="card card-hover card-animate p-6 flex items-center gap-4"
+            className="card card-hover card-animate p-6 flex items-center gap-4 cursor-pointer"
+            role="button"
+            tabIndex={0}
+            onKeyDown={(e) => e.key === 'Enter' && navigate(`/countries/${country.id}`)}
           >
             <span className="text-5xl">{getCountryEmoji(country.code)}</span>
             <div>
@@ -69,7 +74,7 @@ const Countries = () => {
                 {country.region_count} {country.region_count === 1 ? 'region' : 'regions'}
               </p>
             </div>
-          </Link>
+          </div>
         ))}
       </div>
 

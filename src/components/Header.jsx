@@ -1,36 +1,39 @@
 /**
  * Header Component with navigation and wallet connection
+ * Refactored to use useNavigate instead of Link
  */
-import { Link, useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import { connectWallet, disconnect, selectWallet } from '../store/slices/walletSlice';
 import config from '../config';
-import { usePageLoadAnimation, animationPatterns } from '../hooks/useAnimation';
 
 const Header = () => {
   const location = useLocation();
+  const navigate = useNavigate();
   const dispatch = useDispatch();
   const { address, balance, isConnected, isConnecting, isMetaMaskInstalled } = useSelector(selectWallet);
-
-  // Animation hook for header load animation
-  const headerRef = usePageLoadAnimation(50);
 
   const isActive = (path) => location.pathname === path;
 
   const handleConnect = () => dispatch(connectWallet());
   const handleDisconnect = () => dispatch(disconnect());
 
+  const handleNavigation = (path) => {
+    navigate(path);
+  };
+
+  const handleExternalLink = (url) => {
+    window.open(url, '_blank', 'noopener,noreferrer');
+  };
+
   return (
-    <header ref={headerRef} className="bg-dark border-b border-gray-800 sticky top-0 z-50">
+    <header className="bg-dark border-b border-gray-800 sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
-          <Link
-            to="/"
-            className="flex items-center gap-2 text-white hover:text-primary transition-colors"
-            data-animate="fade-right"
-            data-duration="fast"
-            data-delay="0"
+          <button
+            onClick={() => handleNavigation('/')}
+            className="flex items-center gap-2 text-white hover:text-primary transition-colors cursor-pointer bg-transparent border-none"
           >
             <svg
               className="w-8 h-8"
@@ -60,33 +63,26 @@ const Header = () => {
               </defs>
             </svg>
             <span className="font-bold text-lg hidden sm:inline">Municipal Flag NFT</span>
-          </Link>
+          </button>
 
           {/* Navigation */}
           <nav className="hidden md:flex items-center gap-1">
-            <NavLink to="/countries" active={isActive('/countries')} index={0}>Explore</NavLink>
-            <NavLink to="/auctions" active={isActive('/auctions')} index={1}>Auctions</NavLink>
-            <NavLink to="/rankings" active={isActive('/rankings')} index={2}>Rankings</NavLink>
-            <NavLink to="/profile" active={isActive('/profile')} index={3}>Profile</NavLink>
-            <NavLink to="/admin" active={isActive('/admin')} index={4}>Admin</NavLink>
+            <NavButton path="/countries" active={isActive('/countries')} onClick={handleNavigation}>Explore</NavButton>
+            <NavButton path="/auctions" active={isActive('/auctions')} onClick={handleNavigation}>Auctions</NavButton>
+            <NavButton path="/rankings" active={isActive('/rankings')} onClick={handleNavigation}>Rankings</NavButton>
+            <NavButton path="/profile" active={isActive('/profile')} onClick={handleNavigation}>Profile</NavButton>
+            <NavButton path="/admin" active={isActive('/admin')} onClick={handleNavigation}>Admin</NavButton>
           </nav>
 
           {/* Wallet Section */}
-          <div
-            className="flex items-center gap-3"
-            data-animate="fade-left"
-            data-duration="fast"
-            data-delay="3"
-          >
+          <div className="flex items-center gap-3">
             {!isMetaMaskInstalled ? (
-              <a
-                href="https://metamask.io/download/"
-                target="_blank"
-                rel="noopener noreferrer"
+              <button
+                onClick={() => handleExternalLink('https://metamask.io/download/')}
                 className="btn btn-primary text-sm py-2"
               >
                 Install MetaMask
-              </a>
+              </button>
             ) : isConnected ? (
               <div className="flex items-center gap-3">
                 <div className="hidden sm:flex flex-col items-end">
@@ -119,38 +115,37 @@ const Header = () => {
 
       {/* Mobile Navigation */}
       <nav className="md:hidden border-t border-gray-800 px-4 py-2 flex justify-around">
-        <MobileNavLink to="/countries" active={isActive('/countries')}>Explore</MobileNavLink>
-        <MobileNavLink to="/auctions" active={isActive('/auctions')}>Auctions</MobileNavLink>
-        <MobileNavLink to="/rankings" active={isActive('/rankings')}>Rankings</MobileNavLink>
-        <MobileNavLink to="/profile" active={isActive('/profile')}>Profile</MobileNavLink>
+        <MobileNavButton path="/countries" active={isActive('/countries')} onClick={handleNavigation}>Explore</MobileNavButton>
+        <MobileNavButton path="/auctions" active={isActive('/auctions')} onClick={handleNavigation}>Auctions</MobileNavButton>
+        <MobileNavButton path="/rankings" active={isActive('/rankings')} onClick={handleNavigation}>Rankings</MobileNavButton>
+        <MobileNavButton path="/profile" active={isActive('/profile')} onClick={handleNavigation}>Profile</MobileNavButton>
       </nav>
     </header>
   );
 };
 
-const NavLink = ({ to, active, children, index = 0 }) => (
-  <Link
-    to={to}
-    {...animationPatterns.nav(index)}
-    className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+const NavButton = ({ path, active, onClick, children }) => (
+  <button
+    onClick={() => onClick(path)}
+    className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors cursor-pointer bg-transparent border-none ${
       active
         ? 'bg-primary/20 text-primary'
         : 'text-gray-300 hover:text-white hover:bg-gray-800'
     }`}
   >
     {children}
-  </Link>
+  </button>
 );
 
-const MobileNavLink = ({ to, active, children }) => (
-  <Link
-    to={to}
-    className={`px-3 py-1 text-xs font-medium transition-colors ${
+const MobileNavButton = ({ path, active, onClick, children }) => (
+  <button
+    onClick={() => onClick(path)}
+    className={`px-3 py-1 text-xs font-medium transition-colors cursor-pointer bg-transparent border-none ${
       active ? 'text-primary' : 'text-gray-400 hover:text-white'
     }`}
   >
     {children}
-  </Link>
+  </button>
 );
 
 export default Header;

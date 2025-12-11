@@ -1,8 +1,9 @@
 /**
  * Home Page - Landing page for the application
+ * Refactored to use useNavigate instead of Link
  */
 import { useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import { fetchCountries, selectCountries, selectCountriesLoading } from '../store/slices/countriesSlice';
 import { fetchPopularFlags, selectPopularFlags } from '../store/slices/flagsSlice';
@@ -11,6 +12,7 @@ import Loading from '../components/Loading';
 import { useAnimation, usePageLoadAnimation, animationPatterns } from '../hooks/useAnimation';
 
 const Home = () => {
+  const navigate = useNavigate();
   const dispatch = useDispatch();
   const countries = useSelector(selectCountries);
   const popularFlags = useSelector(selectPopularFlags);
@@ -58,12 +60,12 @@ const Home = () => {
             data-delay="4"
             className="flex flex-wrap justify-center gap-4"
           >
-            <Link to="/countries" className="btn btn-primary">
+            <button onClick={() => navigate('/countries')} className="btn btn-primary">
               Start Exploring
-            </Link>
-            <Link to="/rankings" className="btn btn-outline">
+            </button>
+            <button onClick={() => navigate('/rankings')} className="btn btn-outline">
               View Rankings
-            </Link>
+            </button>
           </div>
 
           {/* Stats */}
@@ -137,20 +139,20 @@ const Home = () => {
             >
               Popular Flags
             </h2>
-            <Link
-              to="/countries"
+            <button
+              onClick={() => navigate('/countries')}
               data-animate="fade-left"
               data-duration="normal"
               data-delay="0"
-              className="text-primary hover:text-primary-light transition-colors"
+              className="text-primary hover:text-primary-light transition-colors bg-transparent border-none cursor-pointer"
             >
               View All →
-            </Link>
+            </button>
           </div>
           <div className="grid-cards">
             {popularFlags.map((flag, index) => (
               <div key={flag.id} {...animationPatterns.cards(index)}>
-                <FlagCard flag={flag} showMunicipality />
+                <FlagCard flag={flag} showMunicipality index={index} />
               </div>
             ))}
           </div>
@@ -168,30 +170,33 @@ const Home = () => {
           >
             Explore Countries
           </h2>
-          <Link
-            to="/countries"
+          <button
+            onClick={() => navigate('/countries')}
             data-animate="fade-left"
             data-duration="normal"
             data-delay="0"
-            className="text-primary hover:text-primary-light transition-colors"
+            className="text-primary hover:text-primary-light transition-colors bg-transparent border-none cursor-pointer"
           >
             View All →
-          </Link>
+          </button>
         </div>
         <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
           {countries.slice(0, 4).map((country, index) => (
-            <Link
-              to={`/countries/${country.id}`}
+            <div
               key={country.id}
+              onClick={() => navigate(`/countries/${country.id}`)}
               data-animate="zoom-in"
               data-duration="normal"
               data-delay={String(index + 1)}
-              className="card card-hover card-animate p-6 text-center"
+              className="card card-hover card-animate p-6 text-center cursor-pointer"
+              role="button"
+              tabIndex={0}
+              onKeyDown={(e) => e.key === 'Enter' && navigate(`/countries/${country.id}`)}
             >
               <span className="text-5xl mb-4 block">{getCountryEmoji(country.code)}</span>
               <h3 className="text-white font-semibold text-lg mb-1">{country.name}</h3>
               <span className="text-gray-400 text-sm">{country.region_count} regions</span>
-            </Link>
+            </div>
           ))}
         </div>
       </section>

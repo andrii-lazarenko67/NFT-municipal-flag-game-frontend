@@ -1,8 +1,9 @@
 /**
  * Municipality Detail Page - Show flags of a municipality
+ * Refactored to use useNavigate instead of Link
  */
 import { useEffect } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import { fetchMunicipality, selectCurrentMunicipality, selectCountriesLoading } from '../store/slices/countriesSlice';
 import FlagCard from '../components/FlagCard';
@@ -11,6 +12,7 @@ import { useAnimation, usePageLoadAnimation, animationPatterns } from '../hooks/
 
 const MunicipalityDetail = () => {
   const { id } = useParams();
+  const navigate = useNavigate();
   const dispatch = useDispatch();
   const municipality = useSelector(selectCurrentMunicipality);
   const loading = useSelector(selectCountriesLoading);
@@ -29,23 +31,25 @@ const MunicipalityDetail = () => {
   return (
     <div className="page-container">
       <nav ref={headerRef} className="breadcrumb">
-        <Link
-          to="/countries"
+        <button
+          onClick={() => navigate('/countries')}
           data-animate="fade-right"
           data-duration="fast"
           data-delay="0"
+          className="bg-transparent border-none cursor-pointer text-inherit hover:text-primary"
         >
           Countries
-        </Link>
+        </button>
         <span data-animate="fade" data-duration="fast" data-delay="1">/</span>
-        <Link
-          to={`/regions/${municipality.region?.id}`}
+        <button
+          onClick={() => navigate(`/regions/${municipality.region?.id}`)}
           data-animate="fade-right"
           data-duration="fast"
           data-delay="1"
+          className="bg-transparent border-none cursor-pointer text-inherit hover:text-primary"
         >
           {municipality.region?.name}
-        </Link>
+        </button>
         <span data-animate="fade" data-duration="fast" data-delay="2">/</span>
         <span
           data-animate="fade-left"

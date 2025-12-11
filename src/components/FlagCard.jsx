@@ -1,19 +1,26 @@
 /**
  * Flag Card Component - Displays a flag with its details
+ * Refactored to use useNavigate instead of Link
  *
  * MULTI-NFT FEATURE:
  * Displays the number of NFTs required to obtain a flag.
  * - nfts_required=1: Shows standard price
  * - nfts_required=3: Shows "3x NFTs" badge and total price (price * 3)
  */
-import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import config from '../config';
 import { animationPatterns } from '../hooks/useAnimation';
 
 const FlagCard = ({ flag, showMunicipality = false, index = 0 }) => {
+  const navigate = useNavigate();
+
   // MULTI-NFT: Calculate total price based on NFTs required
   const nftsRequired = flag.nfts_required || 1;
   const totalPrice = parseFloat(flag.price) * nftsRequired;
+
+  const handleClick = () => {
+    navigate(`/flags/${flag.id}`);
+  };
 
   const getStatusBadge = () => {
     if (flag.is_pair_complete) {
@@ -65,10 +72,13 @@ const FlagCard = ({ flag, showMunicipality = false, index = 0 }) => {
   };
 
   return (
-    <Link
-      to={`/flags/${flag.id}`}
-      className="card card-hover group block"
+    <div
+      onClick={handleClick}
+      className="card card-hover group block cursor-pointer"
       {...animationPatterns.cards(index)}
+      role="button"
+      tabIndex={0}
+      onKeyDown={(e) => e.key === 'Enter' && handleClick()}
     >
       <div className="relative aspect-square overflow-hidden">
         <img
@@ -106,7 +116,7 @@ const FlagCard = ({ flag, showMunicipality = false, index = 0 }) => {
           <span className="text-gray-500 text-sm">{flag.interest_count || 0} interested</span>
         </div>
       </div>
-    </Link>
+    </div>
   );
 };
 

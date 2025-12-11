@@ -1,8 +1,9 @@
 /**
  * Profile Page - User's profile with flags and interests
+ * Refactored to use useNavigate instead of Link
  */
 import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import { connectWallet, selectAddress, selectIsConnected } from '../store/slices/walletSlice';
 import { fetchUserData, selectUserProfile, selectUserFlags, selectUserInterests, selectUserLoading } from '../store/slices/userSlice';
@@ -12,6 +13,7 @@ import api from '../services/api';
 import { useAnimation, usePageLoadAnimation, animationPatterns } from '../hooks/useAnimation';
 
 const Profile = () => {
+  const navigate = useNavigate();
   const dispatch = useDispatch();
   const address = useSelector(selectAddress);
   const isConnected = useSelector(selectIsConnected);
@@ -202,13 +204,19 @@ const Profile = () => {
                   {...animationPatterns.list(index)}
                   className="flex items-center justify-between p-4 hover:bg-gray-800/50 transition-colors"
                 >
-                  <Link to={`/flags/${ownership.flag_id}`} className="flex-1">
+                  <div
+                    onClick={() => navigate(`/flags/${ownership.flag_id}`)}
+                    className="flex-1 cursor-pointer"
+                    role="button"
+                    tabIndex={0}
+                    onKeyDown={(e) => e.key === 'Enter' && navigate(`/flags/${ownership.flag_id}`)}
+                  >
                     <span className="text-white">Flag #{ownership.flag_id}</span>
                     <span className="badge badge-available ml-2">{ownership.ownership_type}</span>
                     {hasAuction && (
                       <span className="badge bg-yellow-600 text-white ml-2">In Auction</span>
                     )}
-                  </Link>
+                  </div>
                   <button
                     onClick={() => handleCreateAuction(ownership)}
                     className="btn btn-primary btn-sm ml-4"
@@ -227,9 +235,12 @@ const Profile = () => {
             className="card p-8 text-center"
           >
             <p className="text-gray-500">You don't own any flags yet</p>
-            <Link to="/countries" className="text-primary hover:text-primary-light mt-2 inline-block">
+            <button
+              onClick={() => navigate('/countries')}
+              className="text-primary hover:text-primary-light mt-2 inline-block bg-transparent border-none cursor-pointer"
+            >
               Start exploring
-            </Link>
+            </button>
           </div>
         )}
       </section>
@@ -252,17 +263,20 @@ const Profile = () => {
             className="card divide-y divide-gray-800"
           >
             {interests.map((interest, index) => (
-              <Link
+              <div
                 key={interest.id}
-                to={`/flags/${interest.flag_id}`}
+                onClick={() => navigate(`/flags/${interest.flag_id}`)}
                 {...animationPatterns.list(index)}
-                className="flex items-center justify-between p-4 hover:bg-gray-800/50 transition-colors"
+                className="flex items-center justify-between p-4 hover:bg-gray-800/50 transition-colors cursor-pointer"
+                role="button"
+                tabIndex={0}
+                onKeyDown={(e) => e.key === 'Enter' && navigate(`/flags/${interest.flag_id}`)}
               >
                 <span className="text-white">Flag #{interest.flag_id}</span>
                 <span className="text-gray-500 text-sm">
                   {new Date(interest.created_at).toLocaleDateString()}
                 </span>
-              </Link>
+              </div>
             ))}
           </div>
         ) : (

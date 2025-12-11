@@ -1,8 +1,9 @@
 /**
  * Region Detail Page - Show municipalities of a region
+ * Refactored to use useNavigate instead of Link
  */
 import { useEffect } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import { fetchRegion, selectCurrentRegion, selectCountriesLoading } from '../store/slices/countriesSlice';
 import Loading from '../components/Loading';
@@ -10,6 +11,7 @@ import { useAnimation, usePageLoadAnimation } from '../hooks/useAnimation';
 
 const RegionDetail = () => {
   const { id } = useParams();
+  const navigate = useNavigate();
   const dispatch = useDispatch();
   const region = useSelector(selectCurrentRegion);
   const loading = useSelector(selectCountriesLoading);
@@ -28,23 +30,25 @@ const RegionDetail = () => {
   return (
     <div className="page-container">
       <nav ref={headerRef} className="breadcrumb">
-        <Link
-          to="/countries"
+        <button
+          onClick={() => navigate('/countries')}
           data-animate="fade-right"
           data-duration="fast"
           data-delay="0"
+          className="bg-transparent border-none cursor-pointer text-inherit hover:text-primary"
         >
           Countries
-        </Link>
+        </button>
         <span data-animate="fade" data-duration="fast" data-delay="1">/</span>
-        <Link
-          to={`/countries/${region.country?.id}`}
+        <button
+          onClick={() => navigate(`/countries/${region.country?.id}`)}
           data-animate="fade-right"
           data-duration="fast"
           data-delay="1"
+          className="bg-transparent border-none cursor-pointer text-inherit hover:text-primary"
         >
           {region.country?.name}
-        </Link>
+        </button>
         <span data-animate="fade" data-duration="fast" data-delay="2">/</span>
         <span
           data-animate="fade-left"
@@ -77,18 +81,21 @@ const RegionDetail = () => {
 
       <div ref={gridRef} className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
         {region.municipalities?.map((muni, index) => (
-          <Link
-            to={`/municipalities/${muni.id}`}
+          <div
             key={muni.id}
+            onClick={() => navigate(`/municipalities/${muni.id}`)}
             data-animate={index % 3 === 0 ? "zoom-in" : "fade-up"}
             data-duration="normal"
             data-delay={String(index % 8)}
-            className="card card-hover card-animate p-6"
+            className="card card-hover card-animate p-6 cursor-pointer"
+            role="button"
+            tabIndex={0}
+            onKeyDown={(e) => e.key === 'Enter' && navigate(`/municipalities/${muni.id}`)}
           >
             <h2 className="text-white font-semibold text-lg mb-1">{muni.name}</h2>
             <p className="text-gray-500 text-xs mb-2 font-mono">{muni.coordinates}</p>
             <p className="text-gray-400 text-sm">{muni.flag_count} flags</p>
-          </Link>
+          </div>
         ))}
       </div>
 

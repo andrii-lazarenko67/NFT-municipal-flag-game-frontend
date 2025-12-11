@@ -8,7 +8,7 @@
  * - Shows winner_category for closed auctions
  */
 import { useEffect, useState } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import {
   fetchAuction,
@@ -26,6 +26,7 @@ import { useAnimation, usePageLoadAnimation, animationPatterns } from '../hooks/
 
 const AuctionDetail = () => {
   const { id } = useParams();
+  const navigate = useNavigate();
   const dispatch = useDispatch();
   const auction = useSelector(selectCurrentAuction);
   const loading = useSelector(selectAuctionsLoading);
@@ -122,9 +123,12 @@ const AuctionDetail = () => {
           className="text-center py-16"
         >
           <p className="text-red-400">Auction not found</p>
-          <Link to="/auctions" className="text-primary hover:text-primary-light mt-4 inline-block">
+          <button
+            onClick={() => navigate('/auctions')}
+            className="text-primary hover:text-primary-light mt-4 inline-block bg-transparent border-none cursor-pointer"
+          >
             Back to Auctions
-          </Link>
+          </button>
         </div>
       </div>
     );
@@ -169,14 +173,15 @@ const AuctionDetail = () => {
     <div className="page-container">
       {/* Breadcrumb */}
       <nav ref={headerRef} className="breadcrumb mb-6">
-        <Link
-          to="/auctions"
+        <button
+          onClick={() => navigate('/auctions')}
           data-animate="fade-right"
           data-duration="fast"
           data-delay="0"
+          className="bg-transparent border-none cursor-pointer text-inherit hover:text-primary"
         >
           Auctions
-        </Link>
+        </button>
         <span data-animate="fade" data-duration="fast" data-delay="1">/</span>
         <span
           data-animate="fade-left"
@@ -223,12 +228,12 @@ const AuctionDetail = () => {
               data-delay="2"
               className="mt-4"
             >
-              <Link
-                to={`/flags/${auction.flag_id}`}
-                className="text-primary hover:text-primary-light"
+              <button
+                onClick={() => navigate(`/flags/${auction.flag_id}`)}
+                className="text-primary hover:text-primary-light bg-transparent border-none cursor-pointer"
               >
                 View Flag Details
-              </Link>
+              </button>
               <div className="flex gap-2 mt-2">
                 {auction.flag.category && (
                   <span className={`badge badge-${auction.flag.category.toLowerCase()}`}>

@@ -1,5 +1,6 @@
 /**
  * Auctions Page - Active auctions list
+ * Refactored to use useNavigate instead of Link
  *
  * ENHANCED FEATURES:
  * - Displays min_price (floor price)
@@ -7,7 +8,7 @@
  * - Shows category badge for bidders
  */
 import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import {
   fetchAuctions,
@@ -19,6 +20,7 @@ import config from '../config';
 import { useAnimation, usePageLoadAnimation, animationPatterns } from '../hooks/useAnimation';
 
 const Auctions = () => {
+  const navigate = useNavigate();
   const dispatch = useDispatch();
   const auctions = useSelector(selectAuctions);
   const loading = useSelector(selectAuctionsLoading);
@@ -106,11 +108,14 @@ const Auctions = () => {
       {auctions.length > 0 ? (
         <div ref={gridRef} className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {auctions.map((auction, index) => (
-            <Link
-              to={`/auctions/${auction.id}`}
+            <div
               key={auction.id}
+              onClick={() => navigate(`/auctions/${auction.id}`)}
               {...animationPatterns.cards(index)}
-              className="card card-hover card-animate overflow-hidden relative"
+              className="card card-hover card-animate overflow-hidden relative cursor-pointer"
+              role="button"
+              tabIndex={0}
+              onKeyDown={(e) => e.key === 'Enter' && navigate(`/auctions/${auction.id}`)}
             >
               {/* Status Badge */}
               <div className="absolute top-2 right-2 z-10">
@@ -201,7 +206,7 @@ const Auctions = () => {
                   </span>
                 </div>
               </div>
-            </Link>
+            </div>
           ))}
         </div>
       ) : (

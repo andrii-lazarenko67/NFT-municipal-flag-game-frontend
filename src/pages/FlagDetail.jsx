@@ -14,7 +14,7 @@
  * - Updated action buttons to reflect grouped acquisition
  */
 import { useEffect } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import {
   fetchFlag,
@@ -35,6 +35,7 @@ import { useAnimation, usePageLoadAnimation } from '../hooks/useAnimation';
 
 const FlagDetail = () => {
   const { id } = useParams();
+  const navigate = useNavigate();
   const dispatch = useDispatch();
   const flag = useSelector(selectCurrentFlag);
   const loading = useSelector(selectFlagsLoading);
@@ -127,25 +128,27 @@ const FlagDetail = () => {
   return (
     <div className="page-container">
       <nav ref={headerRef} className="breadcrumb">
-        <Link
-          to="/countries"
+        <button
+          onClick={() => navigate('/countries')}
           data-animate="fade-right"
           data-duration="fast"
           data-delay="0"
+          className="bg-transparent border-none cursor-pointer text-inherit hover:text-primary"
         >
           Countries
-        </Link>
+        </button>
         {flag.municipality && (
           <>
             <span data-animate="fade" data-duration="fast" data-delay="1">/</span>
-            <Link
-              to={`/municipalities/${flag.municipality.id}`}
+            <button
+              onClick={() => navigate(`/municipalities/${flag.municipality.id}`)}
               data-animate="fade-right"
               data-duration="fast"
               data-delay="1"
+              className="bg-transparent border-none cursor-pointer text-inherit hover:text-primary"
             >
               {flag.municipality.name}
-            </Link>
+            </button>
           </>
         )}
         <span data-animate="fade" data-duration="fast" data-delay="2">/</span>

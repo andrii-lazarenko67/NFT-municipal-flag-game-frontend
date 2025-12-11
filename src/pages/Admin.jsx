@@ -56,7 +56,7 @@ import {
   selectAdminError,
   clearMessage,
 } from '../store/slices/adminSlice';
-import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import config from '../config';
 import { usePageLoadAnimation, useAnimation } from '../hooks/useAnimation';
 
@@ -1305,12 +1305,12 @@ const GenerateNFTTab = ({ municipalities, dispatch, nftGenerationResult, nftGene
 
               <p className="text-green-400 text-sm">{nftGenerationResult.message}</p>
 
-              <Link
-                to={`/flags/${nftGenerationResult.flag_id}`}
-                className="btn btn-primary inline-block"
+              <button
+                onClick={() => window.location.href = `/flags/${nftGenerationResult.flag_id}`}
+                className="btn btn-primary"
               >
                 View Flag Page
-              </Link>
+              </button>
             </div>
           ) : (
             <div className="text-red-400">
@@ -1438,12 +1438,12 @@ const DemoUserTab = ({ demoUser, dispatch, loading, actionLoading }) => {
               </div>
 
               <div className="mt-4 flex gap-4">
-                <Link
-                  to={`/profile/${demoUser.user.wallet_address}`}
+                <button
+                  onClick={() => window.location.href = `/profile/${demoUser.user.wallet_address}`}
                   className="btn btn-secondary"
                 >
                   View Profile Page
-                </Link>
+                </button>
                 <button
                   onClick={handleDeleteDemoUser}
                   disabled={actionLoading}
