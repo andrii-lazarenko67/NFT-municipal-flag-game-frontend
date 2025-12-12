@@ -126,77 +126,132 @@ const FlagsTab = ({ flags, municipalities, dispatch, actionLoading }) => {
         </div>
       </div>
 
+      <AdminTable columns={columns} data={filteredFlags} emptyMessage="No flags found." />
+
+      {/* Flag Form Modal */}
       {showForm && (
-        <div className="card p-6 mb-6" data-animate="fade-down" data-duration="fast">
-          <h3 className="text-white font-semibold mb-4">{editItem ? 'Edit Flag' : 'Add New Flag'}</h3>
-          <form onSubmit={handleSubmit} className="grid md:grid-cols-3 lg:grid-cols-4 gap-4">
-            <input
-              type="text"
-              placeholder="Flag Name (Coordinates)"
-              value={formData.name}
-              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-              className="input"
-              required
-            />
-            <select
-              value={formData.municipality_id}
-              onChange={(e) => setFormData({ ...formData, municipality_id: e.target.value })}
-              className="input"
-              required
-            >
-              <option value="">Select Municipality</option>
-              {municipalities.map((m) => (
-                <option key={m.id} value={m.id}>{m.name}</option>
-              ))}
-            </select>
-            <input
-              type="text"
-              placeholder="Location Type (e.g., fire station)"
-              value={formData.location_type}
-              onChange={(e) => setFormData({ ...formData, location_type: e.target.value })}
-              className="input"
-              required
-            />
-            <select
-              value={formData.category}
-              onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-              className="input"
-            >
-              <option value="standard">Standard</option>
-              <option value="plus">Plus</option>
-              <option value="premium">Premium</option>
-            </select>
-            <input
-              type="number"
-              min="1"
-              max="10"
-              placeholder="NFTs Required"
-              value={formData.nfts_required}
-              onChange={(e) => setFormData({ ...formData, nfts_required: e.target.value })}
-              className="input"
-              required
-            />
-            <input
-              type="number"
-              step="0.001"
-              min="0"
-              placeholder="Price (MATIC)"
-              value={formData.price}
-              onChange={(e) => setFormData({ ...formData, price: e.target.value })}
-              className="input"
-              required
-            />
-            <div className="flex gap-2 md:col-span-2">
-              <button type="submit" disabled={actionLoading} className="btn btn-primary">
-                {actionLoading ? 'Saving...' : editItem ? 'Update' : 'Create'}
+        <div className="fixed inset-0 bg-black/75 flex items-center justify-center z-50 p-4">
+          <div
+            className="card max-w-2xl w-full p-6"
+            data-animate="zoom-in"
+            data-duration="fast"
+          >
+            {/* Modal Header */}
+            <div className="flex items-center justify-between mb-6">
+              <h3 className="text-xl font-bold text-white">
+                {editItem ? 'Edit Flag' : 'Add New Flag'}
+              </h3>
+              <button
+                onClick={resetForm}
+                className="text-gray-400 hover:text-white transition-colors"
+              >
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
               </button>
-              {editItem && <button type="button" onClick={resetForm} className="btn btn-secondary">Cancel</button>}
             </div>
-          </form>
+
+            {/* Modal Form */}
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <div className="grid md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm text-gray-400 mb-1">Flag Name (Coordinates)</label>
+                  <input
+                    type="text"
+                    placeholder="e.g., 41.385100, 2.173400"
+                    value={formData.name}
+                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                    className="input w-full"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm text-gray-400 mb-1">Municipality</label>
+                  <select
+                    value={formData.municipality_id}
+                    onChange={(e) => setFormData({ ...formData, municipality_id: e.target.value })}
+                    className="input w-full"
+                    required
+                  >
+                    <option value="">Select Municipality</option>
+                    {municipalities.map((m) => (
+                      <option key={m.id} value={m.id}>{m.name}</option>
+                    ))}
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm text-gray-400 mb-1">Location Type</label>
+                  <input
+                    type="text"
+                    placeholder="e.g., Fire Station, Town Hall"
+                    value={formData.location_type}
+                    onChange={(e) => setFormData({ ...formData, location_type: e.target.value })}
+                    className="input w-full"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm text-gray-400 mb-1">Category</label>
+                  <select
+                    value={formData.category}
+                    onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+                    className="input w-full"
+                  >
+                    <option value="standard">Standard</option>
+                    <option value="plus">Plus</option>
+                    <option value="premium">Premium</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm text-gray-400 mb-1">NFTs Required</label>
+                  <input
+                    type="number"
+                    min="1"
+                    max="10"
+                    placeholder="1"
+                    value={formData.nfts_required}
+                    onChange={(e) => setFormData({ ...formData, nfts_required: e.target.value })}
+                    className="input w-full"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm text-gray-400 mb-1">Price (MATIC)</label>
+                  <input
+                    type="number"
+                    step="0.001"
+                    min="0"
+                    placeholder="0.01"
+                    value={formData.price}
+                    onChange={(e) => setFormData({ ...formData, price: e.target.value })}
+                    className="input w-full"
+                    required
+                  />
+                </div>
+              </div>
+
+              {/* Modal Actions */}
+              <div className="flex gap-3 pt-4 border-t border-gray-700">
+                <button
+                  type="button"
+                  onClick={resetForm}
+                  className="btn btn-secondary flex-1"
+                  disabled={actionLoading}
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={actionLoading}
+                  className="btn btn-primary flex-1"
+                >
+                  {actionLoading ? 'Saving...' : editItem ? 'Update Flag' : 'Create Flag'}
+                </button>
+              </div>
+            </form>
+          </div>
         </div>
       )}
-
-      <AdminTable columns={columns} data={filteredFlags} emptyMessage="No flags found." />
     </div>
   );
 };

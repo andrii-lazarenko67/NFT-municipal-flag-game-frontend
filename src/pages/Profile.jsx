@@ -1,9 +1,9 @@
 /**
  * Profile Page - User's profile with flags and interests
- * Refactored to use useNavigate instead of Link
+ * Supports viewing own profile (when connected) or any user's profile by address
  */
 import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import { connectWallet, selectAddress, selectIsConnected } from '../store/slices/walletSlice';
 import { fetchUserData, selectUserProfile, selectUserFlags, selectUserInterests, selectUserLoading } from '../store/slices/userSlice';
@@ -14,12 +14,17 @@ import api from '../services/api';
 const Profile = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const address = useSelector(selectAddress);
+  const { address: urlAddress } = useParams(); // Get address from URL if provided
+  const connectedAddress = useSelector(selectAddress);
   const isConnected = useSelector(selectIsConnected);
   const profile = useSelector(selectUserProfile);
   const flags = useSelector(selectUserFlags);
   const interests = useSelector(selectUserInterests);
   const loading = useSelector(selectUserLoading);
+
+  // Determine which address to display - URL param takes precedence
+  const address = urlAddress || connectedAddress;
+  const isOwnProfile = !urlAddress || (isConnected && urlAddress?.toLowerCase() === connectedAddress?.toLowerCase());
 
   const [showAuctionModal, setShowAuctionModal] = useState(false);
   const [selectedFlag, setSelectedFlag] = useState(null);
@@ -31,11 +36,12 @@ const Profile = () => {
   const [activeAuctions, setActiveAuctions] = useState([]);
 
   useEffect(() => {
-    if (isConnected && address) {
+    // Load profile data if we have an address (either from URL or connected wallet)
+    if (address) {
       dispatch(fetchUserData(address));
       loadActiveAuctions();
     }
-  }, [dispatch, isConnected, address]);
+  }, [dispatch, address]);
 
   const loadActiveAuctions = async () => {
     try {
@@ -89,7 +95,8 @@ const Profile = () => {
     }
   };
 
-  if (!isConnected) {
+  // Only show connect prompt if no address at all (not viewing someone else's profile)
+  if (!address) {
     return (
       <div className="page-container">
         <div className="max-w-md mx-auto text-center py-20">
@@ -119,7 +126,7 @@ const Profile = () => {
           data-duration="normal"
           className="page-title"
         >
-          My Profile
+          {isOwnProfile ? 'My Profile' : (profile?.username || 'User Profile')}
         </h1>
         <p
           data-animate="fade-up"
@@ -166,14 +173,14 @@ const Profile = () => {
         </div>
       </div>
 
-      {/* My Flags */}
+      {/* Flags */}
       <section className="mb-8">
         <h2
           data-animate="fade-right"
           data-duration="normal"
           className="text-xl font-bold text-white mb-4"
         >
-          My Flags ({flags.length})
+          {isOwnProfile ? 'My Flags' : 'Flags Owned'} ({flags.length})
         </h2>
         {flags.length > 0 ? (
           <div
@@ -203,13 +210,15 @@ const Profile = () => {
                       <span className="badge bg-yellow-600 text-white ml-2">In Auction</span>
                     )}
                   </div>
-                  <button
-                    onClick={() => handleCreateAuction(ownership)}
-                    className="btn btn-primary btn-sm ml-4"
-                    disabled={hasAuction}
-                  >
-                    {hasAuction ? 'Already in Auction' : 'Create Auction'}
-                  </button>
+                  {isOwnProfile && (
+                    <button
+                      onClick={() => handleCreateAuction(ownership)}
+                      className="btn btn-primary btn-sm ml-4"
+                      disabled={hasAuction}
+                    >
+                      {hasAuction ? 'Already in Auction' : 'Create Auction'}
+                    </button>
+                  )}
                 </div>
               );
             })}
@@ -231,14 +240,14 @@ const Profile = () => {
         )}
       </section>
 
-      {/* My Interests */}
+      {/* Interests */}
       <section>
         <h2
           data-animate="fade-right"
           data-duration="normal"
           className="text-xl font-bold text-white mb-4"
         >
-          My Interests ({interests.length})
+          {isOwnProfile ? 'My Interests' : 'Interests'} ({interests.length})
         </h2>
         {interests.length > 0 ? (
           <div

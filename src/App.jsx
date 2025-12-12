@@ -42,6 +42,7 @@ function App() {
               <Route path="/municipalities/:id" element={<MunicipalityDetail />} />
               <Route path="/flags/:id" element={<FlagDetail />} />
               <Route path="/profile" element={<Profile />} />
+              <Route path="/profile/:address" element={<Profile />} />
               <Route path="/auctions" element={<Auctions />} />
               <Route path="/auctions/:id" element={<AuctionDetail />} />
               <Route path="/rankings" element={<Rankings />} />
