@@ -7,10 +7,8 @@ import {
   seedDemoUserOwnership,
   deleteDemoUser,
 } from '../../store/slices/adminSlice';
-import { usePageLoadAnimation } from '../../hooks/useAnimation';
 
 const DemoUserTab = ({ demoUser, dispatch, loading, actionLoading }) => {
-  const pageRef = usePageLoadAnimation(50);
   const [flagCount, setFlagCount] = useState(5);
   const [categories, setCategories] = useState(['standard', 'plus', 'premium']);
 
@@ -45,7 +43,7 @@ const DemoUserTab = ({ demoUser, dispatch, loading, actionLoading }) => {
   };
 
   return (
-    <div ref={pageRef} className="space-y-8">
+    <div className="space-y-8">
       {/* Demo User Info */}
       <div className="card p-6" data-animate="fade-up" data-duration="normal">
         <h3 className="text-xl font-bold text-white mb-4">Demo User Management</h3>
@@ -90,7 +88,7 @@ const DemoUserTab = ({ demoUser, dispatch, loading, actionLoading }) => {
 };
 
 const UserDetails = ({ user, onDelete, actionLoading }) => (
-  <div className="bg-dark-darker rounded-[3px] p-4" data-animate="fade-right" data-duration="fast" data-delay="1">
+  <div className="bg-dark-darker rounded-[3px] p-4" data-animate="fade-right" data-duration="fast">
     <h4 className="text-white font-semibold mb-4">Demo User Details</h4>
     <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
       <div>
@@ -146,7 +144,7 @@ const UserDetails = ({ user, onDelete, actionLoading }) => (
 );
 
 const SeedOwnershipForm = ({ flagCount, setFlagCount, categories, toggleCategory, onSeed, actionLoading }) => (
-  <div className="bg-dark-darker rounded-[3px] p-4" data-animate="fade-right" data-duration="fast" data-delay="2">
+  <div className="bg-dark-darker rounded-[3px] p-4" data-animate="fade-right" data-duration="fast">
     <h4 className="text-white font-semibold mb-4">Seed Flag Ownerships</h4>
     <p className="text-gray-400 text-sm mb-4">
       Assign flag ownerships to the demo user to demonstrate the profile and collection features.
@@ -197,7 +195,7 @@ const SeedOwnershipForm = ({ flagCount, setFlagCount, categories, toggleCategory
 );
 
 const DemoCredentials = () => (
-  <div className="card p-6" data-animate="fade-up" data-duration="normal" data-delay="3">
+  <div className="card p-6" data-animate="fade-up" data-duration="normal">
     <h3 className="text-lg font-bold text-white mb-4">Demo User Credentials</h3>
     <p className="text-gray-400 mb-4">
       Use these credentials to test the platform as the demo user:

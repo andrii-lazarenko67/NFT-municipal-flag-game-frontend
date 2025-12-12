@@ -5,20 +5,18 @@
    - Multiple animation directions
    - Variable durations
    - Staggered delays for sequential reveals
+   - NO JavaScript required - pure CSS animations
    ============================================================ */
 
 /* ============================================================
    BASE ANIMATION SETUP
    ============================================================ */
 
-/* Elements start hidden and animate in when .animate class is added */
+/* Elements automatically animate on load - no JavaScript required */
 [data-animate] {
-  opacity: 0;
-  will-change: transform, opacity;
-}
-
-[data-animate].animate {
   animation-fill-mode: forwards;
+  animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  animation-duration: 600ms;
 }
 
 /* ============================================================
@@ -27,9 +25,6 @@
 
 /* Fade Up - Element fades in while moving upward */
 [data-animate="fade-up"] {
-  transform: translateY(40px);
-}
-[data-animate="fade-up"].animate {
   animation-name: fadeUp;
 }
 
@@ -46,9 +41,6 @@
 
 /* Fade Down - Element fades in while moving downward */
 [data-animate="fade-down"] {
-  transform: translateY(-40px);
-}
-[data-animate="fade-down"].animate {
   animation-name: fadeDown;
 }
 
@@ -65,9 +57,6 @@
 
 /* Fade Left - Element fades in while moving from right to left */
 [data-animate="fade-left"] {
-  transform: translateX(40px);
-}
-[data-animate="fade-left"].animate {
   animation-name: fadeLeft;
 }
 
@@ -84,9 +73,6 @@
 
 /* Fade Right - Element fades in while moving from left to right */
 [data-animate="fade-right"] {
-  transform: translateX(-40px);
-}
-[data-animate="fade-right"].animate {
   animation-name: fadeRight;
 }
 
@@ -103,9 +89,6 @@
 
 /* Zoom In - Element scales up from smaller size */
 [data-animate="zoom-in"] {
-  transform: scale(0.8);
-}
-[data-animate="zoom-in"].animate {
   animation-name: zoomIn;
 }
 
@@ -122,9 +105,6 @@
 
 /* Zoom Out - Element scales down from larger size */
 [data-animate="zoom-out"] {
-  transform: scale(1.2);
-}
-[data-animate="zoom-out"].animate {
   animation-name: zoomOut;
 }
 
@@ -141,10 +121,6 @@
 
 /* Flip Up - Element rotates in from bottom */
 [data-animate="flip-up"] {
-  transform: perspective(1000px) rotateX(45deg);
-  transform-origin: bottom center;
-}
-[data-animate="flip-up"].animate {
   animation-name: flipUp;
 }
 
@@ -161,10 +137,6 @@
 
 /* Flip Down - Element rotates in from top */
 [data-animate="flip-down"] {
-  transform: perspective(1000px) rotateX(-45deg);
-  transform-origin: top center;
-}
-[data-animate="flip-down"].animate {
   animation-name: flipDown;
 }
 
@@ -181,9 +153,6 @@
 
 /* Fade - Simple fade in */
 [data-animate="fade"] {
-  transform: none;
-}
-[data-animate="fade"].animate {
   animation-name: fadeIn;
 }
 
@@ -198,9 +167,6 @@
 
 /* Slide Up - Larger slide distance */
 [data-animate="slide-up"] {
-  transform: translateY(80px);
-}
-[data-animate="slide-up"].animate {
   animation-name: slideUp;
 }
 
@@ -217,9 +183,6 @@
 
 /* Bounce In */
 [data-animate="bounce-in"] {
-  transform: scale(0.3);
-}
-[data-animate="bounce-in"].animate {
   animation-name: bounceIn;
 }
 
@@ -245,80 +208,57 @@
    ANIMATION DURATIONS
    ============================================================ */
 
-[data-duration="very-fast"].animate {
+[data-duration="very-fast"] {
   animation-duration: 200ms;
 }
 
-[data-duration="fast"].animate {
+[data-duration="fast"] {
   animation-duration: 400ms;
 }
 
-[data-duration="normal"].animate {
+[data-duration="normal"] {
   animation-duration: 600ms;
 }
 
-[data-duration="light-slow"].animate {
+[data-duration="light-slow"] {
   animation-duration: 800ms;
 }
 
-[data-duration="slow"].animate {
+[data-duration="slow"] {
   animation-duration: 1000ms;
 }
 
-[data-duration="very-slow"].animate {
+[data-duration="very-slow"] {
   animation-duration: 1200ms;
-}
-
-/* Default duration if not specified */
-[data-animate].animate:not([data-duration]) {
-  animation-duration: 600ms;
 }
 
 /* ============================================================
    ANIMATION DELAYS (for staggered effects)
    ============================================================ */
 
-[data-delay="0"].animate { animation-delay: 0ms; }
-[data-delay="1"].animate { animation-delay: 100ms; }
-[data-delay="2"].animate { animation-delay: 200ms; }
-[data-delay="3"].animate { animation-delay: 300ms; }
-[data-delay="4"].animate { animation-delay: 400ms; }
-[data-delay="5"].animate { animation-delay: 500ms; }
-[data-delay="6"].animate { animation-delay: 600ms; }
-[data-delay="7"].animate { animation-delay: 700ms; }
-[data-delay="8"].animate { animation-delay: 800ms; }
-[data-delay="9"].animate { animation-delay: 900ms; }
-[data-delay="10"].animate { animation-delay: 1000ms; }
-[data-delay="11"].animate { animation-delay: 1100ms; }
-[data-delay="12"].animate { animation-delay: 1200ms; }
 
 /* ============================================================
    ANIMATION TIMING FUNCTIONS
    ============================================================ */
 
-[data-easing="ease"].animate {
+[data-easing="ease"] {
   animation-timing-function: ease;
 }
 
-[data-easing="ease-in"].animate {
+[data-easing="ease-in"] {
   animation-timing-function: ease-in;
 }
 
-[data-easing="ease-out"].animate {
+[data-easing="ease-out"] {
   animation-timing-function: ease-out;
 }
 
-[data-easing="ease-in-out"].animate {
+[data-easing="ease-in-out"] {
   animation-timing-function: ease-in-out;
 }
 
-[data-easing="spring"].animate {
+[data-easing="spring"] {
   animation-timing-function: cubic-bezier(0.175, 0.885, 0.32, 1.275);
-}
-
-/* Default timing function */
-[data-animate].animate:not([data-easing]) {
-  animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 /* ============================================================
@@ -327,9 +267,6 @@
 
 /* Hero animations - more dramatic */
 .hero-animate {
-  opacity: 0;
-}
-.hero-animate.animate {
   animation: heroEntrance 1s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
@@ -366,7 +303,7 @@
 .stagger-group [data-animate]:nth-child(7) { --stagger-delay: 6; }
 .stagger-group [data-animate]:nth-child(8) { --stagger-delay: 7; }
 
-.stagger-group [data-animate].animate {
+.stagger-group [data-animate] {
   animation-delay: calc(var(--stagger-delay) * 100ms);
 }
 
@@ -376,9 +313,7 @@
 
 @media (prefers-reduced-motion: reduce) {
   [data-animate],
-  [data-animate].animate,
-  .hero-animate,
-  .hero-animate.animate {
+  .hero-animate {
     animation: none !important;
     opacity: 1 !important;
     transform: none !important;
@@ -394,9 +329,4 @@
   opacity: 1 !important;
   transform: none !important;
   animation: none !important;
-}
-
-/* Force animation restart */
-.animate-restart {
-  animation: none;
 }

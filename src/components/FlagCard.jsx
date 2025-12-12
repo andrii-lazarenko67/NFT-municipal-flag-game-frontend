@@ -9,7 +9,6 @@
  */
 import { useNavigate } from 'react-router-dom';
 import config from '../config';
-import { animationPatterns } from '../hooks/useAnimation';
 
 const FlagCard = ({ flag, showMunicipality = false, index = 0 }) => {
   const navigate = useNavigate();
@@ -75,7 +74,8 @@ const FlagCard = ({ flag, showMunicipality = false, index = 0 }) => {
     <div
       onClick={handleClick}
       className="card card-hover group block cursor-pointer"
-      {...animationPatterns.cards(index)}
+      data-animate="fade-up"
+      data-duration="normal"
       role="button"
       tabIndex={0}
       onKeyDown={(e) => e.key === 'Enter' && handleClick()}

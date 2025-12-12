@@ -2,10 +2,8 @@
  * UtilitiesTab - Admin interface for utility operations
  */
 import { seedDemoData, syncIpfsFromPinata, fetchIpfsStatus } from '../../store/slices/adminSlice';
-import { usePageLoadAnimation } from '../../hooks/useAnimation';
 
 const UtilitiesTab = ({ ipfsStatus, dispatch, loading }) => {
-  const pageRef = usePageLoadAnimation(50);
   const handleSeedDemo = () => {
     if (window.confirm('This will seed demo data. Are you sure?')) {
       dispatch(seedDemoData());
@@ -19,7 +17,7 @@ const UtilitiesTab = ({ ipfsStatus, dispatch, loading }) => {
   };
 
   return (
-    <div ref={pageRef} className="space-y-8">
+    <div className="space-y-8">
       {/* Demo Data */}
       <div className="card p-6" data-animate="fade-up" data-duration="normal">
         <h3 className="text-xl font-bold text-white mb-4">Seed Demo Data</h3>
@@ -32,7 +30,7 @@ const UtilitiesTab = ({ ipfsStatus, dispatch, loading }) => {
       </div>
 
       {/* IPFS Sync */}
-      <div className="card p-6" data-animate="fade-up" data-duration="normal" data-delay="1">
+      <div className="card p-6" data-animate="fade-up" data-duration="normal">
         <h3 className="text-xl font-bold text-white mb-4">IPFS Image Sync</h3>
         <p className="text-gray-400 mb-4">
           Sync flag images from Pinata IPFS. This updates the database with the latest image hashes.
@@ -47,7 +45,7 @@ const UtilitiesTab = ({ ipfsStatus, dispatch, loading }) => {
 };
 
 const IpfsStatusGrid = ({ status }) => (
-  <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4" data-animate="zoom-in" data-duration="fast" data-delay="2">
+  <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4" data-animate="zoom-in" data-duration="fast">
     <div className="bg-dark-darker p-3 rounded text-center">
       <span className="text-primary font-bold block text-xl">{status.total_flags}</span>
       <span className="text-gray-500 text-sm">Total Flags</span>

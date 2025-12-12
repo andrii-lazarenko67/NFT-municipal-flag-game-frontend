@@ -10,7 +10,6 @@ import { fetchUserData, selectUserProfile, selectUserFlags, selectUserInterests,
 import Loading from '../components/Loading';
 import config from '../config';
 import api from '../services/api';
-import { useAnimation, usePageLoadAnimation, animationPatterns } from '../hooks/useAnimation';
 
 const Profile = () => {
   const navigate = useNavigate();
@@ -21,12 +20,6 @@ const Profile = () => {
   const flags = useSelector(selectUserFlags);
   const interests = useSelector(selectUserInterests);
   const loading = useSelector(selectUserLoading);
-
-  // Animation hooks
-  const headerRef = usePageLoadAnimation(100);
-  const { ref: statsRef } = useAnimation({ threshold: 0.2 });
-  const { ref: flagsRef } = useAnimation({ threshold: 0.1 });
-  const { ref: interestsRef } = useAnimation({ threshold: 0.1 });
 
   const [showAuctionModal, setShowAuctionModal] = useState(false);
   const [selectedFlag, setSelectedFlag] = useState(null);
@@ -120,11 +113,10 @@ const Profile = () => {
 
   return (
     <div className="page-container">
-      <div ref={headerRef} className="page-header">
+      <div className="page-header">
         <h1
           data-animate="fade-down"
           data-duration="normal"
-          data-delay="0"
           className="page-title"
         >
           My Profile
@@ -132,7 +124,6 @@ const Profile = () => {
         <p
           data-animate="fade-up"
           data-duration="normal"
-          data-delay="1"
           className="text-gray-400 font-mono"
         >
           {config.truncateAddress(address, 8)}
@@ -140,11 +131,10 @@ const Profile = () => {
       </div>
 
       {/* Stats */}
-      <div ref={statsRef} className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
         <div
           data-animate="flip-up"
           data-duration="normal"
-          data-delay="0"
           className="stat-card"
         >
           <span className="stat-value">{profile?.reputation_score || 0}</span>
@@ -153,7 +143,6 @@ const Profile = () => {
         <div
           data-animate="flip-up"
           data-duration="normal"
-          data-delay="1"
           className="stat-card"
         >
           <span className="stat-value">{flags.length}</span>
@@ -162,7 +151,6 @@ const Profile = () => {
         <div
           data-animate="flip-up"
           data-duration="normal"
-          data-delay="2"
           className="stat-card"
         >
           <span className="stat-value">{interests.length}</span>
@@ -171,7 +159,6 @@ const Profile = () => {
         <div
           data-animate="flip-up"
           data-duration="normal"
-          data-delay="3"
           className="stat-card"
         >
           <span className="stat-value">{profile?.followers_count || 0}</span>
@@ -180,11 +167,10 @@ const Profile = () => {
       </div>
 
       {/* My Flags */}
-      <section ref={flagsRef} className="mb-8">
+      <section className="mb-8">
         <h2
           data-animate="fade-right"
           data-duration="normal"
-          data-delay="0"
           className="text-xl font-bold text-white mb-4"
         >
           My Flags ({flags.length})
@@ -193,7 +179,6 @@ const Profile = () => {
           <div
             data-animate="fade-up"
             data-duration="normal"
-            data-delay="1"
             className="card divide-y divide-gray-800"
           >
             {flags.map((ownership, index) => {
@@ -201,7 +186,8 @@ const Profile = () => {
               return (
                 <div
                   key={ownership.id}
-                  {...animationPatterns.list(index)}
+                  data-animate="fade-right"
+                  data-duration="fast"
                   className="flex items-center justify-between p-4 hover:bg-gray-800/50 transition-colors"
                 >
                   <div
@@ -246,11 +232,10 @@ const Profile = () => {
       </section>
 
       {/* My Interests */}
-      <section ref={interestsRef}>
+      <section>
         <h2
           data-animate="fade-right"
           data-duration="normal"
-          data-delay="0"
           className="text-xl font-bold text-white mb-4"
         >
           My Interests ({interests.length})
@@ -259,14 +244,14 @@ const Profile = () => {
           <div
             data-animate="fade-up"
             data-duration="normal"
-            data-delay="1"
             className="card divide-y divide-gray-800"
           >
             {interests.map((interest, index) => (
               <div
                 key={interest.id}
                 onClick={() => navigate(`/flags/${interest.flag_id}`)}
-                {...animationPatterns.list(index)}
+                data-animate="fade-right"
+                data-duration="fast"
                 className="flex items-center justify-between p-4 hover:bg-gray-800/50 transition-colors cursor-pointer"
                 role="button"
                 tabIndex={0}

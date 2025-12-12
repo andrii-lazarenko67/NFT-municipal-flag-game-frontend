@@ -8,7 +8,6 @@ import { useSelector, useDispatch } from 'react-redux';
 import { fetchMunicipality, selectCurrentMunicipality, selectCountriesLoading } from '../store/slices/countriesSlice';
 import FlagCard from '../components/FlagCard';
 import Loading from '../components/Loading';
-import { useAnimation, usePageLoadAnimation, animationPatterns } from '../hooks/useAnimation';
 
 const MunicipalityDetail = () => {
   const { id } = useParams();
@@ -16,10 +15,6 @@ const MunicipalityDetail = () => {
   const dispatch = useDispatch();
   const municipality = useSelector(selectCurrentMunicipality);
   const loading = useSelector(selectCountriesLoading);
-
-  // Animation hooks
-  const headerRef = usePageLoadAnimation(100);
-  const { ref: gridRef } = useAnimation({ threshold: 0.1 });
 
   useEffect(() => {
     dispatch(fetchMunicipality(id));
@@ -30,31 +25,28 @@ const MunicipalityDetail = () => {
 
   return (
     <div className="page-container">
-      <nav ref={headerRef} className="breadcrumb">
+      <nav className="breadcrumb">
         <button
           onClick={() => navigate('/countries')}
           data-animate="fade-right"
           data-duration="fast"
-          data-delay="0"
           className="bg-transparent border-none cursor-pointer text-inherit hover:text-primary"
         >
           Countries
         </button>
-        <span data-animate="fade" data-duration="fast" data-delay="1">/</span>
+        <span data-animate="fade" data-duration="fast">/</span>
         <button
           onClick={() => navigate(`/regions/${municipality.region?.id}`)}
           data-animate="fade-right"
           data-duration="fast"
-          data-delay="1"
           className="bg-transparent border-none cursor-pointer text-inherit hover:text-primary"
         >
           {municipality.region?.name}
         </button>
-        <span data-animate="fade" data-duration="fast" data-delay="2">/</span>
+        <span data-animate="fade" data-duration="fast">/</span>
         <span
           data-animate="fade-left"
           data-duration="fast"
-          data-delay="3"
           className="text-white"
         >
           {municipality.name}
@@ -65,7 +57,6 @@ const MunicipalityDetail = () => {
         <h1
           data-animate="fade-down"
           data-duration="normal"
-          data-delay="1"
           className="page-title"
         >
           {municipality.name}
@@ -73,16 +64,19 @@ const MunicipalityDetail = () => {
         <p
           data-animate="fade-up"
           data-duration="normal"
-          data-delay="2"
           className="page-subtitle font-mono"
         >
           {municipality.coordinates}
         </p>
       </div>
 
-      <div ref={gridRef} className="grid-cards">
+      <div className="grid-cards">
         {municipality.flags?.map((flag, index) => (
-          <div key={flag.id} {...animationPatterns.cards(index)}>
+          <div
+            key={flag.id}
+            data-animate="fade-up"
+            data-duration="normal"
+          >
             <FlagCard flag={flag} />
           </div>
         ))}

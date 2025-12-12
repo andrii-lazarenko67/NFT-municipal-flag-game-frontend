@@ -35,8 +35,6 @@ import {
   selectAdminError,
   clearMessage,
 } from '../store/slices/adminSlice';
-import { usePageLoadAnimation } from '../hooks/useAnimation';
-
 // Admin Tab Components
 import {
   StatsTab,
@@ -54,12 +52,11 @@ const TABS = ['Stats', 'Countries', 'Regions', 'Municipalities', 'Flags', 'Gener
 // Login Screen Component
 const AdminLogin = ({ onAuth, loading, error }) => {
   const [adminKey, setAdminKey] = useState('');
-  const pageRef = usePageLoadAnimation(100);
 
   const handleSubmit = () => onAuth(adminKey);
 
   return (
-    <div ref={pageRef} className="page-container">
+    <div className="page-container">
       <div className="max-w-md mx-auto py-20">
         <div className="card p-8" data-animate="zoom-in" data-duration="normal">
           <h1 className="text-2xl font-bold text-white mb-2 text-center">
@@ -97,10 +94,9 @@ const AdminDashboard = ({
   loading, actionLoading, message, error, dispatch, onLogout
 }) => {
   const [activeTab, setActiveTab] = useState('Stats');
-  const pageRef = usePageLoadAnimation(100);
 
   return (
-    <div ref={pageRef} className="page-container">
+    <div className="page-container">
       {/* Header */}
       <div className="flex justify-between items-center mb-6">
         <h1 className="page-title" data-animate="fade-right" data-duration="normal">
@@ -111,7 +107,6 @@ const AdminDashboard = ({
           className="btn btn-secondary"
           data-animate="fade-left"
           data-duration="fast"
-          data-delay="1"
         >
           Logout
         </button>
@@ -134,7 +129,6 @@ const AdminDashboard = ({
         className="flex gap-2 mb-6 overflow-x-auto pb-2"
         data-animate="fade-up"
         data-duration="normal"
-        data-delay="2"
       >
         {TABS.map((tab) => (
           <button

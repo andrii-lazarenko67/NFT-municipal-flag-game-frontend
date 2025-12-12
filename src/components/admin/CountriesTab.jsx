@@ -8,14 +8,12 @@ import {
   deleteCountry,
   toggleCountryVisibility,
 } from '../../store/slices/adminSlice';
-import { usePageLoadAnimation } from '../../hooks/useAnimation';
 import AdminTable from './AdminTable';
 
 const CountriesTab = ({ countries, dispatch, actionLoading }) => {
   const [showForm, setShowForm] = useState(false);
   const [editItem, setEditItem] = useState(null);
   const [formData, setFormData] = useState({ name: '', code: '', is_visible: true });
-  const pageRef = usePageLoadAnimation(50);
 
   const resetForm = () => {
     setFormData({ name: '', code: '', is_visible: true });
@@ -87,7 +85,7 @@ const CountriesTab = ({ countries, dispatch, actionLoading }) => {
   ];
 
   return (
-    <div ref={pageRef}>
+    <div>
       <div className="flex justify-between items-center mb-4" data-animate="fade-right" data-duration="fast">
         <h2 className="text-xl font-bold text-white">Countries ({countries.length})</h2>
         <button onClick={() => setShowForm(!showForm)} className="btn btn-primary">
@@ -96,7 +94,7 @@ const CountriesTab = ({ countries, dispatch, actionLoading }) => {
       </div>
 
       {showForm && (
-        <div className="card p-6 mb-6" data-animate="fade-down" data-duration="fast" data-delay="1">
+        <div className="card p-6 mb-6" data-animate="fade-down" data-duration="fast">
           <h3 className="text-white font-semibold mb-4">{editItem ? 'Edit Country' : 'Add New Country'}</h3>
           <form onSubmit={handleSubmit} className="grid md:grid-cols-3 gap-4">
             <input

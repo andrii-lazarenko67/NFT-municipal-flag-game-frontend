@@ -1,16 +1,13 @@
 /**
  * StatsTab - Admin statistics overview
  */
-import { usePageLoadAnimation } from '../../hooks/useAnimation';
 import StatCard from './StatCard';
 
 const StatsTab = ({ stats }) => {
-  const pageRef = usePageLoadAnimation(50);
-
   if (!stats) return <div className="text-gray-500">Loading statistics...</div>;
 
   return (
-    <div ref={pageRef} className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
       <StatCard label="Countries" value={stats.total_countries} index={0} />
       <StatCard label="Regions" value={stats.total_regions} index={1} />
       <StatCard label="Municipalities" value={stats.total_municipalities} index={2} />

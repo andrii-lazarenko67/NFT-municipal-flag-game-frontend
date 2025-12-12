@@ -4,7 +4,7 @@
 
 const AdminTable = ({ columns, data, emptyMessage = 'No items found.' }) => {
   return (
-    <div className="card overflow-x-auto" data-animate="fade-up" data-duration="normal" data-delay="2">
+    <div className="card overflow-x-auto" data-animate="fade-up" data-duration="normal">
       <table className="w-full">
         <thead className="bg-dark-darker">
           <tr>

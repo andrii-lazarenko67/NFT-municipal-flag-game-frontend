@@ -12,7 +12,6 @@ import {
 } from '../store/slices/rankingsSlice';
 import Loading from '../components/Loading';
 import config from '../config';
-import { useAnimation, usePageLoadAnimation, animationPatterns } from '../hooks/useAnimation';
 
 const Rankings = () => {
   const dispatch = useDispatch();
@@ -22,18 +21,9 @@ const Rankings = () => {
   const flagRankings = useSelector(selectFlagRankings);
   const loading = useSelector(selectRankingsLoading);
 
-  // Animation hooks
-  const headerRef = usePageLoadAnimation(100);
-  const { ref: listRef, reset: resetAnimations } = useAnimation({ threshold: 0.1 });
-
   useEffect(() => {
     dispatch(fetchAllRankings(10));
   }, [dispatch]);
-
-  // Reset animations when tab changes
-  useEffect(() => {
-    resetAnimations();
-  }, [tab, resetAnimations]);
 
   if (loading && userRankings.length === 0) return <Loading />;
 
@@ -55,7 +45,8 @@ const Rankings = () => {
       return (
         <div
           key={item.rank}
-          {...animationPatterns.list(index)}
+          data-animate="fade-right"
+          data-duration="fast"
           className="flex items-center gap-4 p-4 border-b border-gray-800 last:border-b-0"
         >
           <span className="text-2xl font-bold text-primary w-10">#{item.rank}</span>
@@ -71,7 +62,8 @@ const Rankings = () => {
     return (
       <div
         key={item.rank}
-        {...animationPatterns.list(index)}
+        data-animate="fade-right"
+        data-duration="fast"
         className="flex items-center gap-4 p-4 border-b border-gray-800 last:border-b-0"
       >
         <span className="text-2xl font-bold text-primary w-10">#{item.rank}</span>
@@ -89,11 +81,10 @@ const Rankings = () => {
 
   return (
     <div className="page-container">
-      <div ref={headerRef} className="page-header">
+      <div className="page-header">
         <h1
           data-animate="fade-down"
           data-duration="normal"
-          data-delay="0"
           className="page-title"
         >
           Rankings
@@ -101,7 +92,6 @@ const Rankings = () => {
         <p
           data-animate="fade-up"
           data-duration="normal"
-          data-delay="1"
           className="page-subtitle"
         >
           Top collectors and most popular flags
@@ -112,7 +102,6 @@ const Rankings = () => {
       <div
         data-animate="fade-up"
         data-duration="normal"
-        data-delay="2"
         className="flex gap-2 mb-8 border-b border-gray-800 pb-4"
       >
         <TabButton active={tab === 'users'} onClick={() => setTab('users')} delay="0">
@@ -127,11 +116,10 @@ const Rankings = () => {
       </div>
 
       {/* Rankings List */}
-      <div ref={listRef}>
+      <div>
         <div
           data-animate="fade-up"
           data-duration="normal"
-          data-delay="0"
           className="card"
         >
           {rankings.length > 0 ? (
@@ -152,7 +140,6 @@ const TabButton = ({ active, onClick, children, delay = "0" }) => (
     onClick={onClick}
     data-animate="fade-up"
     data-duration="fast"
-    data-delay={delay}
     className={`px-4 py-2 rounded-[3px] font-medium transition-colors ${
       active
         ? 'bg-primary text-white'

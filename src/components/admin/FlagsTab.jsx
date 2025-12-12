@@ -3,7 +3,6 @@
  */
 import { useState } from 'react';
 import { createFlag, updateFlag } from '../../store/slices/adminSlice';
-import { usePageLoadAnimation } from '../../hooks/useAnimation';
 import AdminTable from './AdminTable';
 
 const FlagsTab = ({ flags, municipalities, dispatch, actionLoading }) => {
@@ -13,7 +12,6 @@ const FlagsTab = ({ flags, municipalities, dispatch, actionLoading }) => {
   const [formData, setFormData] = useState({
     name: '', municipality_id: '', location_type: '', category: 'standard', nfts_required: '1', price: '0.01',
   });
-  const pageRef = usePageLoadAnimation(50);
 
   const filteredFlags = filterMunicipalityId
     ? flags.filter((f) => f.municipality_id === parseInt(filterMunicipalityId))
@@ -112,7 +110,7 @@ const FlagsTab = ({ flags, municipalities, dispatch, actionLoading }) => {
   ];
 
   return (
-    <div ref={pageRef}>
+    <div>
       <div className="flex justify-between items-center mb-4 flex-wrap gap-4" data-animate="fade-right" data-duration="fast">
         <h2 className="text-xl font-bold text-white">Flags ({filteredFlags.length})</h2>
         <div className="flex gap-4">
@@ -129,7 +127,7 @@ const FlagsTab = ({ flags, municipalities, dispatch, actionLoading }) => {
       </div>
 
       {showForm && (
-        <div className="card p-6 mb-6" data-animate="fade-down" data-duration="fast" data-delay="1">
+        <div className="card p-6 mb-6" data-animate="fade-down" data-duration="fast">
           <h3 className="text-white font-semibold mb-4">{editItem ? 'Edit Flag' : 'Add New Flag'}</h3>
           <form onSubmit={handleSubmit} className="grid md:grid-cols-3 lg:grid-cols-4 gap-4">
             <input

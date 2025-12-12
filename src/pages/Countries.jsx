@@ -7,7 +7,6 @@ import { useNavigate } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import { fetchCountries, selectCountries, selectCountriesLoading, selectCountriesError } from '../store/slices/countriesSlice';
 import Loading from '../components/Loading';
-import { useAnimation, usePageLoadAnimation } from '../hooks/useAnimation';
 
 const Countries = () => {
   const navigate = useNavigate();
@@ -15,10 +14,6 @@ const Countries = () => {
   const countries = useSelector(selectCountries);
   const loading = useSelector(selectCountriesLoading);
   const error = useSelector(selectCountriesError);
-
-  // Animation hooks
-  const headerRef = usePageLoadAnimation(100);
-  const { ref: gridRef } = useAnimation({ threshold: 0.1 });
 
   useEffect(() => {
     dispatch(fetchCountries());
@@ -34,11 +29,10 @@ const Countries = () => {
 
   return (
     <div className="page-container">
-      <div ref={headerRef} className="page-header">
+      <div className="page-header">
         <h1
           data-animate="fade-down"
           data-duration="normal"
-          data-delay="0"
           className="page-title"
         >
           Explore Countries
@@ -46,21 +40,19 @@ const Countries = () => {
         <p
           data-animate="fade-up"
           data-duration="normal"
-          data-delay="1"
           className="page-subtitle"
         >
           Select a country to explore its regions and municipal flags
         </p>
       </div>
 
-      <div ref={gridRef} className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+      <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
         {countries.map((country, index) => (
           <div
             key={country.id}
             onClick={() => navigate(`/countries/${country.id}`)}
             data-animate={index % 2 === 0 ? "fade-up" : "zoom-in"}
             data-duration="normal"
-            data-delay={String(index % 8)}
             className="card card-hover card-animate p-6 flex items-center gap-4 cursor-pointer"
             role="button"
             tabIndex={0}

@@ -17,7 +17,6 @@ import {
 } from '../store/slices/auctionsSlice';
 import Loading from '../components/Loading';
 import config from '../config';
-import { useAnimation, usePageLoadAnimation, animationPatterns } from '../hooks/useAnimation';
 
 const Auctions = () => {
   const navigate = useNavigate();
@@ -25,10 +24,6 @@ const Auctions = () => {
   const auctions = useSelector(selectAuctions);
   const loading = useSelector(selectAuctionsLoading);
   const [showAll, setShowAll] = useState(false);
-
-  // Animation hooks
-  const headerRef = usePageLoadAnimation(100);
-  const { ref: gridRef } = useAnimation({ threshold: 0.1 });
 
   useEffect(() => {
     dispatch(fetchAuctions(!showAll));
@@ -66,13 +61,12 @@ const Auctions = () => {
 
   return (
     <div className="page-container">
-      <div ref={headerRef} className="page-header">
+      <div className="page-header">
         <div className="flex justify-between items-center">
           <div>
             <h1
               data-animate="fade-down"
               data-duration="normal"
-              data-delay="0"
               className="page-title"
             >
               Auctions
@@ -80,7 +74,6 @@ const Auctions = () => {
             <p
               data-animate="fade-up"
               data-duration="normal"
-              data-delay="1"
               className="page-subtitle"
             >
               Bid on flags from other collectors
@@ -89,7 +82,6 @@ const Auctions = () => {
           <div
             data-animate="fade-left"
             data-duration="normal"
-            data-delay="2"
             className="flex items-center gap-4"
           >
             <label className="flex items-center gap-2 text-gray-400">
@@ -106,12 +98,13 @@ const Auctions = () => {
       </div>
 
       {auctions.length > 0 ? (
-        <div ref={gridRef} className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {auctions.map((auction, index) => (
             <div
               key={auction.id}
               onClick={() => navigate(`/auctions/${auction.id}`)}
-              {...animationPatterns.cards(index)}
+              data-animate="fade-up"
+              data-duration="normal"
               className="card card-hover card-animate overflow-hidden relative cursor-pointer"
               role="button"
               tabIndex={0}

@@ -31,7 +31,6 @@ import { selectAddress, selectIsConnected } from '../store/slices/walletSlice';
 import { claimFirstNFT as web3ClaimFirst, purchaseSecondNFT as web3PurchaseSecond } from '../services/web3';
 import config from '../config';
 import Loading from '../components/Loading';
-import { useAnimation, usePageLoadAnimation } from '../hooks/useAnimation';
 
 const FlagDetail = () => {
   const { id } = useParams();
@@ -43,10 +42,6 @@ const FlagDetail = () => {
   const address = useSelector(selectAddress);
   const isConnected = useSelector(selectIsConnected);
   const discountedPrice = useSelector(selectDiscountedPrice(id));
-
-  // Animation hooks
-  const headerRef = usePageLoadAnimation(100);
-  const { ref: contentRef } = useAnimation({ threshold: 0.1 });
 
   // MULTI-NFT: Get number of NFTs required (default to 1 for backward compatibility)
   const nftsRequired = flag?.nfts_required || 1;
@@ -66,7 +61,7 @@ const FlagDetail = () => {
       alert('Please connect your wallet first');
       return;
     }
-    dispatch(registerInterest({ flagId: flag.id, address }));
+    await dispatch(registerInterest({ flagId: flag.id, address })).unwrap();
   };
 
   const handleClaimFirst = async () => {
@@ -117,7 +112,7 @@ const FlagDetail = () => {
     ? config.getIpfsUrl(flag.image_ipfs_hash)
     : `https://placehold.co/500x500/1a1a2e/e94560?text=${encodeURIComponent(flag.location_type)}`;
 
-  const hasUserInterest = flag.interests?.some(i => i.user?.wallet_address === address?.toLowerCase());
+  const hasUserInterest = flag.interests?.some(i => i.user?.wallet_address?.toLowerCase() === address?.toLowerCase());
 
   // MULTI-NFT: Calculate total prices
   const basePricePerNft = parseFloat(flag.price);
@@ -127,48 +122,44 @@ const FlagDetail = () => {
 
   return (
     <div className="page-container">
-      <nav ref={headerRef} className="breadcrumb">
+      <nav className="breadcrumb">
         <button
           onClick={() => navigate('/countries')}
           data-animate="fade-right"
           data-duration="fast"
-          data-delay="0"
           className="bg-transparent border-none cursor-pointer text-inherit hover:text-primary"
         >
           Countries
         </button>
         {flag.municipality && (
           <>
-            <span data-animate="fade" data-duration="fast" data-delay="1">/</span>
+            <span data-animate="fade" data-duration="fast">/</span>
             <button
               onClick={() => navigate(`/municipalities/${flag.municipality.id}`)}
               data-animate="fade-right"
               data-duration="fast"
-              data-delay="1"
               className="bg-transparent border-none cursor-pointer text-inherit hover:text-primary"
             >
               {flag.municipality.name}
             </button>
           </>
         )}
-        <span data-animate="fade" data-duration="fast" data-delay="2">/</span>
+        <span data-animate="fade" data-duration="fast">/</span>
         <span
           data-animate="fade-left"
           data-duration="fast"
-          data-delay="3"
           className="text-white"
         >
           {flag.location_type}
         </span>
       </nav>
 
-      <div ref={contentRef} className="grid lg:grid-cols-2 gap-8">
+      <div className="grid lg:grid-cols-2 gap-8">
         {/* Image Section */}
         <div>
           <div
             data-animate="zoom-in"
             data-duration="slow"
-            data-delay="0"
             className="card overflow-hidden"
           >
             <img src={imageUrl} alt={flag.name} className="w-full aspect-square object-cover" />
@@ -176,7 +167,6 @@ const FlagDetail = () => {
           <div
             data-animate="fade-up"
             data-duration="normal"
-            data-delay="2"
             className="flex gap-2 mt-4 flex-wrap"
           >
             <span className={`badge badge-${flag.category.toLowerCase()}`}>{flag.category}</span>
@@ -197,7 +187,6 @@ const FlagDetail = () => {
           <h1
             data-animate="fade-down"
             data-duration="normal"
-            data-delay="1"
             className="text-3xl font-bold text-white mb-2"
           >
             {flag.location_type} Flag
@@ -205,7 +194,6 @@ const FlagDetail = () => {
           <p
             data-animate="fade-up"
             data-duration="normal"
-            data-delay="2"
             className="text-gray-400 font-mono mb-6"
           >
             {flag.name}
@@ -216,7 +204,6 @@ const FlagDetail = () => {
             <div
               data-animate="fade-right"
               data-duration="normal"
-              data-delay="3"
               className="card p-4 mb-4 bg-purple-900/20 border border-purple-600/30"
             >
               <h3 className="text-purple-300 font-semibold mb-2">Grouped NFT Flag</h3>
@@ -231,7 +218,6 @@ const FlagDetail = () => {
           <div
             data-animate="fade-up"
             data-duration="normal"
-            data-delay="3"
             className="card p-6 mb-6"
           >
             {/* MULTI-NFT: Show per-NFT and total price */}
@@ -268,7 +254,6 @@ const FlagDetail = () => {
           <div
             data-animate="fade-up"
             data-duration="normal"
-            data-delay="4"
             className="space-y-3 mb-8"
           >
             {!flag.is_pair_complete && (
@@ -323,7 +308,6 @@ const FlagDetail = () => {
           <div
             data-animate="fade-left"
             data-duration="normal"
-            data-delay="5"
             className="card p-6 mb-4"
           >
             <h3 className="text-white font-semibold mb-4">Interested Users ({flag.interests?.length || 0})</h3>
@@ -334,7 +318,6 @@ const FlagDetail = () => {
                     key={interest.id}
                     data-animate="fade-right"
                     data-duration="fast"
-                    data-delay={String(index % 6)}
                     className="text-gray-400 text-sm font-mono"
                   >
                     {config.truncateAddress(interest.user?.wallet_address)}
@@ -350,7 +333,6 @@ const FlagDetail = () => {
           <div
             data-animate="fade-left"
             data-duration="normal"
-            data-delay="6"
             className="card p-6"
           >
             <h3 className="text-white font-semibold mb-4">Owners</h3>
@@ -361,7 +343,6 @@ const FlagDetail = () => {
                     key={ownership.id}
                     data-animate="fade-right"
                     data-duration="fast"
-                    data-delay={String(index % 6)}
                     className="flex justify-between text-sm"
                   >
                     <span className="text-gray-400 font-mono">{config.truncateAddress(ownership.user?.wallet_address)}</span>

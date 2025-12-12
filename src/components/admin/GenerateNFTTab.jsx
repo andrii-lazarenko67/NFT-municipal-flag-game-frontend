@@ -3,11 +3,9 @@
  */
 import { useState } from 'react';
 import { createNFTFromCoordinates, checkStreetView } from '../../store/slices/adminSlice';
-import { usePageLoadAnimation } from '../../hooks/useAnimation';
 import config from '../../config';
 
 const GenerateNFTTab = ({ municipalities, dispatch, nftGenerationResult, nftGenerating, streetViewAvailable }) => {
-  const pageRef = usePageLoadAnimation(50);
   const [formData, setFormData] = useState({
     latitude: '',
     longitude: '',
@@ -74,7 +72,7 @@ const GenerateNFTTab = ({ municipalities, dispatch, nftGenerationResult, nftGene
   };
 
   return (
-    <div ref={pageRef} className="space-y-8">
+    <div className="space-y-8">
       {/* NFT Generation Form */}
       <div className="card p-6" data-animate="fade-up" data-duration="normal">
         <h3 className="text-xl font-bold text-white mb-4">Generate NFT from Coordinates</h3>
@@ -253,7 +251,7 @@ const GenerateNFTTab = ({ municipalities, dispatch, nftGenerationResult, nftGene
 };
 
 const GenerationResult = ({ result }) => (
-  <div className="card p-6" data-animate="zoom-in" data-duration="normal" data-delay="1">
+  <div className="card p-6" data-animate="zoom-in" data-duration="normal">
     <h3 className="text-xl font-bold text-white mb-4">
       {result.success ? 'NFT Generated Successfully!' : 'Generation Failed'}
     </h3>
@@ -327,7 +325,7 @@ const GenerationResult = ({ result }) => (
 );
 
 const PipelineInfo = () => (
-  <div className="card p-6" data-animate="fade-up" data-duration="normal" data-delay="2">
+  <div className="card p-6" data-animate="fade-up" data-duration="normal">
     <h3 className="text-lg font-bold text-white mb-4">NFT Generation Pipeline</h3>
     <div className="grid md:grid-cols-5 gap-4 text-center">
       <div className="bg-dark-darker p-4 rounded-[3px]">

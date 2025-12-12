@@ -8,7 +8,6 @@ import {
   deleteRegion,
   toggleRegionVisibility,
 } from '../../store/slices/adminSlice';
-import { usePageLoadAnimation } from '../../hooks/useAnimation';
 import AdminTable from './AdminTable';
 
 const RegionsTab = ({ regions, countries, dispatch, actionLoading }) => {
@@ -16,7 +15,6 @@ const RegionsTab = ({ regions, countries, dispatch, actionLoading }) => {
   const [editItem, setEditItem] = useState(null);
   const [filterCountryId, setFilterCountryId] = useState('');
   const [formData, setFormData] = useState({ name: '', country_id: '', is_visible: true });
-  const pageRef = usePageLoadAnimation(50);
 
   const filteredRegions = filterCountryId
     ? regions.filter((r) => r.country_id === parseInt(filterCountryId))
@@ -96,7 +94,7 @@ const RegionsTab = ({ regions, countries, dispatch, actionLoading }) => {
   ];
 
   return (
-    <div ref={pageRef}>
+    <div>
       <div className="flex justify-between items-center mb-4 flex-wrap gap-4" data-animate="fade-right" data-duration="fast">
         <h2 className="text-xl font-bold text-white">Regions ({filteredRegions.length})</h2>
         <div className="flex gap-4">
@@ -117,7 +115,7 @@ const RegionsTab = ({ regions, countries, dispatch, actionLoading }) => {
       </div>
 
       {showForm && (
-        <div className="card p-6 mb-6" data-animate="fade-down" data-duration="fast" data-delay="1">
+        <div className="card p-6 mb-6" data-animate="fade-down" data-duration="fast">
           <h3 className="text-white font-semibold mb-4">{editItem ? 'Edit Region' : 'Add New Region'}</h3>
           <form onSubmit={handleSubmit} className="grid md:grid-cols-4 gap-4">
             <input
