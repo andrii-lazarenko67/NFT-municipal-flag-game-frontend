@@ -32,6 +32,7 @@ const Header = () => {
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
           <button
+            type="button"
             onClick={() => handleNavigation('/')}
             className="flex items-center gap-2 text-white hover:text-primary transition-colors cursor-pointer bg-transparent border-none"
           >
@@ -95,7 +96,7 @@ const Header = () => {
                 </div>
                 <button
                   onClick={handleDisconnect}
-                  className="px-4 py-2 text-sm bg-red-600/20 text-red-400 rounded-lg hover:bg-red-600/30 transition-colors"
+                  className="px-4 py-2 text-sm bg-red-600/20 text-red-400 rounded-[3px] hover:bg-red-600/30 transition-colors"
                 >
                   Disconnect
                 </button>
@@ -126,8 +127,9 @@ const Header = () => {
 
 const NavButton = ({ path, active, onClick, children }) => (
   <button
+    type="button"
     onClick={() => onClick(path)}
-    className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors cursor-pointer bg-transparent border-none ${
+    className={`px-4 py-2 rounded-[3px] text-sm font-medium transition-colors cursor-pointer bg-transparent border-none ${
       active
         ? 'bg-primary/20 text-primary'
         : 'text-gray-300 hover:text-white hover:bg-gray-800'
@@ -139,6 +141,7 @@ const NavButton = ({ path, active, onClick, children }) => (
 
 const MobileNavButton = ({ path, active, onClick, children }) => (
   <button
+    type="button"
     onClick={() => onClick(path)}
     className={`px-3 py-1 text-xs font-medium transition-colors cursor-pointer bg-transparent border-none ${
       active ? 'text-primary' : 'text-gray-400 hover:text-white'

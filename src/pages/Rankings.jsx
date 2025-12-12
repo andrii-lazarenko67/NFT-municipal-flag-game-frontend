@@ -153,7 +153,7 @@ const TabButton = ({ active, onClick, children, delay = "0" }) => (
     data-animate="fade-up"
     data-duration="fast"
     data-delay={delay}
-    className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+    className={`px-4 py-2 rounded-[3px] font-medium transition-colors ${
       active
         ? 'bg-primary text-white'
         : 'text-gray-400 hover:text-white hover:bg-gray-800'

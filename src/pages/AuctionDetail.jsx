@@ -422,7 +422,7 @@ const AuctionDetail = () => {
                       value={bidAmount}
                       onChange={(e) => setBidAmount(e.target.value)}
                       placeholder={`Min: ${config.formatPrice(minBidAmount)}`}
-                      className="w-full px-4 py-2 bg-dark-darker border border-gray-700 rounded-lg text-white focus:border-primary focus:outline-none"
+                      className="w-full px-4 py-2 bg-dark-darker border border-gray-700 rounded-[3px] text-white focus:border-primary focus:outline-none"
                     />
                     <p className="text-gray-500 text-sm mt-1">
                       Minimum bid: {config.formatPrice(minBidAmount)} POL
@@ -437,7 +437,7 @@ const AuctionDetail = () => {
                     <select
                       value={bidderCategory}
                       onChange={(e) => setBidderCategory(e.target.value)}
-                      className="w-full px-4 py-2 bg-dark-darker border border-gray-700 rounded-lg text-white focus:border-primary focus:outline-none"
+                      className="w-full px-4 py-2 bg-dark-darker border border-gray-700 rounded-[3px] text-white focus:border-primary focus:outline-none"
                     >
                       <option value="standard">Standard</option>
                       <option value="plus">Plus</option>

@@ -313,7 +313,7 @@ const Profile = () => {
                   required
                   value={auctionData.starting_price}
                   onChange={(e) => setAuctionData({ ...auctionData, starting_price: e.target.value })}
-                  className="w-full px-4 py-2 bg-dark-darker border border-gray-700 rounded-lg text-white focus:border-primary focus:outline-none"
+                  className="w-full px-4 py-2 bg-dark-darker border border-gray-700 rounded-[3px] text-white focus:border-primary focus:outline-none"
                   placeholder="0.05"
                 />
               </div>
@@ -325,7 +325,7 @@ const Profile = () => {
                 <select
                   value={auctionData.duration_hours}
                   onChange={(e) => setAuctionData({ ...auctionData, duration_hours: e.target.value })}
-                  className="w-full px-4 py-2 bg-dark-darker border border-gray-700 rounded-lg text-white focus:border-primary focus:outline-none"
+                  className="w-full px-4 py-2 bg-dark-darker border border-gray-700 rounded-[3px] text-white focus:border-primary focus:outline-none"
                 >
                   <option value="24">1 Day</option>
                   <option value="72">3 Days</option>
