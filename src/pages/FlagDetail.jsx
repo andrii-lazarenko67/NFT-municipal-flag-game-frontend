@@ -13,7 +13,7 @@
  * - Shows per-NFT price breakdown
  * - Updated action buttons to reflect grouped acquisition
  */
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import {
@@ -46,6 +46,14 @@ const FlagDetail = () => {
   // MULTI-NFT: Get number of NFTs required (default to 1 for backward compatibility)
   const nftsRequired = flag?.nfts_required || 1;
 
+  // Local loading states for each action
+  const [interestLoading, setInterestLoading] = useState(false);
+  const [claimLoading, setClaimLoading] = useState(false);
+  const [purchaseLoading, setPurchaseLoading] = useState(false);
+
+  // Combined loading state
+  const isActionLoading = actionLoading || interestLoading || claimLoading || purchaseLoading;
+
   useEffect(() => {
     dispatch(fetchFlag(id));
   }, [dispatch, id]);
@@ -61,7 +69,14 @@ const FlagDetail = () => {
       alert('Please connect your wallet first');
       return;
     }
-    await dispatch(registerInterest({ flagId: flag.id, address })).unwrap();
+    setInterestLoading(true);
+    try {
+      await dispatch(registerInterest({ flagId: flag.id, address })).unwrap();
+    } catch (err) {
+      alert(err.message || 'Failed to register interest');
+    } finally {
+      setInterestLoading(false);
+    }
   };
 
   const handleClaimFirst = async () => {
@@ -69,9 +84,10 @@ const FlagDetail = () => {
       alert('Please connect your wallet first');
       return;
     }
+    setClaimLoading(true);
     try {
       const result = await web3ClaimFirst(flag.id);
-      dispatch(claimFirstNFT({ flagId: flag.id, address, transactionHash: result.transactionHash }));
+      await dispatch(claimFirstNFT({ flagId: flag.id, address, transactionHash: result.transactionHash })).unwrap();
       // MULTI-NFT: Update success message based on NFTs required
       if (nftsRequired > 1) {
         alert(`Successfully claimed ${nftsRequired} first NFTs!`);
@@ -79,7 +95,9 @@ const FlagDetail = () => {
         alert('First NFT claimed successfully!');
       }
     } catch (err) {
-      alert(err.message);
+      alert(err.message || 'Transaction error');
+    } finally {
+      setClaimLoading(false);
     }
   };
 
@@ -88,12 +106,13 @@ const FlagDetail = () => {
       alert('Please connect your wallet first');
       return;
     }
+    setPurchaseLoading(true);
     try {
       // MULTI-NFT: Calculate total price for all required NFTs
       const pricePerNft = discountedPrice || flag.price;
       const totalPrice = parseFloat(pricePerNft) * nftsRequired;
       const result = await web3PurchaseSecond(flag.id, totalPrice.toString());
-      dispatch(purchaseSecondNFT({ flagId: flag.id, address, transactionHash: result.transactionHash }));
+      await dispatch(purchaseSecondNFT({ flagId: flag.id, address, transactionHash: result.transactionHash })).unwrap();
       // MULTI-NFT: Update success message based on NFTs required
       if (nftsRequired > 1) {
         alert(`Successfully purchased ${nftsRequired} second NFTs! Pair complete!`);
@@ -101,7 +120,9 @@ const FlagDetail = () => {
         alert('Second NFT purchased! Pair complete!');
       }
     } catch (err) {
-      alert(err.message);
+      alert(err.message || 'Transaction error');
+    } finally {
+      setPurchaseLoading(false);
     }
   };
 
@@ -263,18 +284,18 @@ const FlagDetail = () => {
                     {!hasUserInterest && (
                       <button
                         onClick={handleShowInterest}
-                        disabled={actionLoading}
+                        disabled={isActionLoading}
                         className="btn btn-secondary w-full"
                       >
-                        {actionLoading ? 'Processing...' : 'Show Interest'}
+                        {interestLoading ? 'Registering Interest...' : 'Show Interest'}
                       </button>
                     )}
                     <button
                       onClick={handleClaimFirst}
-                      disabled={actionLoading}
+                      disabled={isActionLoading}
                       className="btn btn-primary w-full"
                     >
-                      {actionLoading ? 'Processing...' : (
+                      {claimLoading ? 'Claiming NFT...' : (
                         nftsRequired > 1
                           ? `Claim First ${nftsRequired} NFTs (Free)`
                           : 'Claim First NFT (Free)'
@@ -285,10 +306,10 @@ const FlagDetail = () => {
                 {flag.first_nft_status === 'claimed' && flag.second_nft_status === 'available' && (
                   <button
                     onClick={handlePurchaseSecond}
-                    disabled={actionLoading}
+                    disabled={isActionLoading}
                     className="btn btn-primary w-full"
                   >
-                    {actionLoading ? 'Processing...' : (
+                    {purchaseLoading ? 'Purchasing NFT...' : (
                       nftsRequired > 1
                         ? `Purchase ${nftsRequired} Second NFTs (${config.formatPrice(totalDiscountedPrice)} MATIC)`
                         : `Purchase Second NFT (${config.formatPrice(discountedPrice || flag.price)} MATIC)`
